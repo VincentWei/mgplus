@@ -5,5 +5,5 @@ functions like path, gradient, anti-aliase stretch, and color combination.
 
 This is mGPlus V1.2.0 for MiniGUI V3.0.x or later.
 
-Copyright (C) 2008 ~ 2009, Beijing FMSoft Technologies Co., Ltd.
+Copyright (C) 2008 ~ 2017, Beijing FMSoft Technologies Co., Ltd.
 
