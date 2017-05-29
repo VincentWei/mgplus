@@ -1,0 +1,6 @@
+Test samples for  MGPlus
+Make command:
+
+    $ ./autogen.sh; ./configure; 
+    $ cd animate; make; make install
+    $ cd ../; make

@@ -1,0 +1,336 @@
+*******************************************************************************
+What's new in trunk:
+
+05/11. BUGFIXING#?: Add include pthread.h when not in _MGRM_THREADS.(houhh)
+	* src/api/graphics.cpp
+	* src/api/lf_fashion.cpp
+	
+02/05. CLEANUP #?: Cleanup the variables those are uninitialized or unused.
+(wanzheng) (merge from rel-3-0)
+	* src/api/lf_fashion.cpp
+
+02/05. BUGFIXING #4433: fix memory leak in MGPlusBrushDelete() and
+draw_scrollbar() (wanzheng) (merge from rel-3-0)
+	* src/api/lf_fashion.cpp
+	* src/api/brush.cpp
+
+02/05. BUGFIXING #4432: fix bug of program which uses fashion renderer will
+hang up when drag thumb of a trackbar(dongkai).
+	* src/api/lf_fashion.cpp
+
+01/20. BUGFIXING #4395: fix bug of wrong cache hit in implementation of fashion 
+renderer(dongkai).
+	* src/api/lf_fashion.cpp
+
+01/14. BUGFIXING #4359: modify MGPlusGraphicLoadBitmap's implement, the input 
+bitmap must be compatible with graphic dc, don't convert this now.(houhuihua)
+	* src/api/graphics.cpp
+
+01/13. BUGFIXING #4346: fix bug of fashion renderer gradient caption bar
+configuration does not take effect.(dongkai)
+	* src/api/lf_fashion.cpp
+
+11/29. BUGFIXING #?: use delete instead of free to delete the Graphic object.
+(ymwei via valgrind).
+	* src/api/graphics.cpp
+
+11/11. BUGFIXING #?: fix bug of corner color of radio button is difference 
+with the background color.(dongkai)
+	* src/api/lf_fashion.cpp
+
+10/20 MODIFICATION #?: fix undefined g_comp_func error on vxwork.(houhuihua)
+	* src/agg/agg_pixfmt_rgba.h
+
+10/14 ENHANCEMENT #?: (houhuihua, wanzheng)
+	- convert between different color spaces
+	- and add hardware surface support
+	- fix bug of MGPlusGraphicSave()
+	* src/agg/agg_pixfmt_rgba.h
+	* src/api/graphics.cpp
+	* src/api/graphics.h
+	* src/api/opt_abgr32.cpp
+	* src/api/opt_argb32.cpp
+	* src/api/opt_basic.cpp
+	* src/api/opt_bgr24.cpp
+	* src/api/opt_bgra32.cpp
+	* src/api/opt_rgb24.cpp
+	* src/api/opt_rgb555.cpp
+	* src/api/opt_rgb565.cpp
+	* src/api/opt_rgba32.cpp
+
+09/05 BUGFIXING #?: Fixed can not link minigui_procs on BCM7405. (dengkexi)
+	* configure.in
+	* Makefile.am 
+
+08/21 BUGFIXING #?: Fixed the draw_caption error. (dengkexi)
+	* src/api/lf_fashion.cpp 
+
+07/22 MAINTENANCE #4: use APP_LIBS instead of LIBS in configure.in. (ymwei)
+	* configure.in
+
+07/22 BUGFIXING #?: Fixed the caption button mousemove. (dengkexi) 
+	* src/api/lf_fashion.cpp
+
+07/22 BUGFIXING #?: Fixed the mStudio push_button gradient bug. (dengkexi) 
+	* src/api/brush.cpp
+
+07/22: MAINTENANCE #3: Add the building script for mstudio
+	* build/buildlib-linux-pc-mstudio
+
+07/21: MAINTENANCE #2: Add option to configure the suffix of library name.
+	* configure.in
+	* src/Makefile.am
+
+07/03 ENHANCEMENT #?: Add get path matrix API. (dengkexi) 
+	* include/mgplus.h
+	* src/api/path.cpp
+
+06/29 ENHANCEMENT #?: Add Arcto API. (dengkexi) 
+	* include/mgplus.h
+	* src/api/path.cpp
+
+07/01 ENHANCEMENT: Enhance MGPlusSetClipPath()/MGPlusWorldTransform()/
+MGPlusGetWorldTransform() API for the mdolphin's canvas(houhuihua).
+	* include/mgplus.h
+	* src/api/graphics.cpp
+	* src/api/opt_basic.cpp
+
+06/29 ENHANCEMENT #?: Enhanced the linear gradient API. (dengkexi) 
+	* src/api/brush.cpp
+	* src/api/brush.h
+	* src/api/opt_basic.cpp
+	* include/mgplus.h
+
+06/29 ENHANCEMENT #?: Add the Bezier and Quadratic Curve API. (dengkexi) 
+	* src/api/path.cpp
+	* include/mgplus.h
+
+06/29 BUGFIXING #?: fixed the clear the DC. (dengkexi) 
+	* src/api/graphic.cpp
+	* src/api/opt_basic.cpp
+	* include/mgplus.h
+	* src/agg/agg_renderer_base.h 
+
+05/27 BUGFIXING #?: memory leek: in src/api/lf_fashion.c, draw_caption,
+draw_caption_button and so on, donot
+release the HGRAPHICS when return
+	* src/api/lf_fashion.c
+
+*******************************************************************************
+What's new in this version (1.2.0, 2009/03/10 ~ 2009/04/30)
+
+05/12 BUGFIXING #?: cleanup code, delete _MGPLUS_PIXFMT_BGRA32 configure
+because it is must need, fixed draw_path_by_nostroke() error when use
+rgba565 (houhh).
+	* configrue.in 
+	* src/api/Makefile.am
+	* src/api/graphic.cpp
+	* opt_bgra32.cpp
+
+05/09 ENHANCEMENT: Enhance the draw image with specify alpha.(dengkexi).
+	* src/api/opt_basic.cpp
+
+03/26 BUGFIXING #?: fixed the stroke not support 1 width(tangjb).
+	* opt_basic.cpp
+
+05/05 BUGFIXING #?: change get dc->DevRC error, should add 1(houhh).
+	* src/api/graphic.cpp
+
+04/24 MODIFICATION #5: check the rotate matrix 
+	* src/api/path.cpp
+	* src/api/graphic.cpp
+
+04/13 MODIFICATION #4: add composite surpport for
+gradient/draw_glyph/fill_image, cleanup the code and add file header(houhh).
+	* src/api/opt_basic.cpp
+	* opt_abgr32.cpp
+	* opt_argb32.cpp
+	* opt_basic.cpp
+	* opt_bgr24.cpp
+	* opt_bgra32.cpp
+	* opt_rgb24.cpp
+	* opt_rgb555.cpp
+	* opt_rgb565.cpp
+	* opt_rgba32.cpp
+
+04/13 BUGFIXING #3470: fixed the MGPlusFillRoundRect define.(dengkexi) 
+	* include/mgplus.h 
+
+04/13 BUGFIXING #3466 3467 3468: add DestroyClipRgn after draw. 
+	* src/api/graphics.cpp
+
+04/10 MODIFICATION #3: restore the treeview's TVS_WITHICON style surpport on
+fashion LF(houhh). 
+	* src/api/opt_basic.cpp
+
+04/08 BUGFIXING #3456: Fiexed the MGPlusDrawRoundRectEx. 
+	* src/api/graphics.cpp
+
+04/08 BUGFIXING #?: add MGPlus fill round rect extend API. 
+	* include/mgplus.h 
+
+04/08 BUGFIXING #3455: replace the draw_dash draw error. 
+	* src/api/opt_basic.cpp
+
+04/03 BUGFIXING #?: replace the square style by butt style. 
+	* src/api/opt_basic.cpp
+
+04/03 MODIFICATION #2: cleanup and modify the renderer code. 
+	* src/api/graphics.cpp
+
+04/02 ENHANCEMENT #11 add MGPlusPathGetVertex() API for get the idx Vertex
+point coordinate and cmd type(houhh).
+	* src/api/path.cpp
+
+04/01 ENHANCEMENT #10 add text/path/smooth_mode hints setting API(houhh).
+	* src/api/path.cpp
+
+03/30 ENHANCEMENT #9 Add
+MGPlusPenSetJoinSytle()/MGPlusPenSetCapStyle()/MGPlusPenSetDashes() API(houhh).
+	* src/api/pen.cpp
+	* src/api/pen.h
+
+03/26 ENHANCEMENT #8: add MGPlusGraphicCreateWithoutCanvas() API, it use
+hdc's surface as canvas of thr Graphics, don't create internal render
+buffer(tangjb).
+	* src/api/graphic.cpp
+	* src/api/graphic.h
+	* src/api/opt_basic.cpp
+	* opt_abgr32.cpp
+	* opt_argb32.cpp
+	* opt_basic.cpp
+	* opt_bgr24.cpp
+	* opt_bgra32.cpp
+	* opt_rgb24.cpp
+	* opt_rgb555.cpp
+	* opt_rgb565.cpp
+	* opt_rgba32.cpp
+
+03/25 MODIFICATION #1: change MGPlusPathTransform() to
+MGPlusTransformPath(), used for apply path martix.(houhh)
+	* src/api/graphic.cpp
+	* src/api/path.cpp
+
+03/25 ENHANCEMENT #7: Enhanced the arc, bezier draw and fill.(dengkexi)
+	* src/api/graphic.cpp
+	* src/api/path.cpp
+
+03/25 ENHANCEMENT #6: Enhanced the round rect draw and fill.(dengkexi)
+	* src/api/graphic.cpp
+
+03/24 BUGFIXING ?: Fixed the path matrix rotate with point.(dengkexi)
+	* src/api/path.cpp
+
+03/23 BUGFIXING ?: Fixed the path matrix rotate.(dengkexi)
+	* src/api/path.cpp
+
+03/15 ENHANCEMENT #5: Enhanced the draw image support matrix.(dengkexi)
+	* src/api/graphic.cpp
+
+03/15 ENHANCEMENT #4: Enhanced the path single and gradient matix.(dengkexi)
+	* src/api/graphic.cpp
+
+03/15 ENHANCEMENT #3: Enhanced the path matix.(dengkexi)
+	* src/api/path.cpp
+	* src/api/path.h
+	* include/mgplus.h
+
+03/13 ENHANCEMENT #2: Enhanced the graphic matix on fill linear gradient.(dengkexi)
+	* src/api/graphic.cpp
+
+03/12 ENHANCEMENT #1: Enhanced the graphic matix on fill a single color and draw path.(dengkexi)
+	* src/api/graphic.cpp
+
+*******************************************************************************
+What's new in this version (1.0.0, 2008/12/02 ~ 2009/03/10)
+
+03/10 BUGFIXING ?: Fix calculate the fashion style of scrollbar error.(dengkexi)
+	* src/api/lf_fashion.cpp
+
+03/03. BUGFIXING ?: Fix MGPlusDrawImage().(houhh)
+	* src/api/graphics.cpp
+
+03/03. ENHANCEMENT #12: fix load error when bitmap with alpha info 
+MGPlusGraphicLoadBitmap(), optimized load bitmap.(houhh)
+	* src/api/graphics.cpp
+
+02/25. ENHANCEMENT #11: optimized and clean up direct_graphic_save()(houhh).
+	* src/api/graphics.h
+	* src/api/graphics.cpp
+
+02/25. CLEANING: Change the MGPLusGraphicsCopyFrom() to MGPlusGraphicsCopy().(houhh)
+	* src/api/graphics.cpp
+
+02/25. CLEANING: clean the code that have comment.(houhh)
+	* src/api/graphics.cpp
+
+02/24. ENHANCEMENT #10:: add api MGPlusDrawImage(), usage is same to the
+FillBoxWithBitmap.(houhh)
+	* include/mgplus.h
+	* src/api/graphics.cpp
+
+02/24. CLEANING: clean the configure.(houhh)
+	* configure.in 
+
+02/17. ENHANCEMENT #9: add GLYPHDATA struct for glyph, add MGPlusDrawGlyph() 
+API, change the MGPlusGlyphOutLine()/MGPlusGetGlyphPath() params, 
+fix MGPlusCreateFont() API(houhuihua).  
+	* src/api/graphics.cpp
+	* src/api/path.cpp
+	* include/mgplus.h
+
+02/16. FIXBUG #3350: some funuction is not supported.(tangjb)
+	* src/api/graphics.cpp
+	* include/mgplus.h
+
+02/13. FIXBUG #3339: change the MGPlusTransformPathEx() to MGPlusPathRotate().(houhuihua)
+	* src/api/path.cpp
+
+01/12. FIXBUG #3300:(houhuihua)
+	* src/api/path.cpp
+
+01/06. FIXBUG : GDCAP_HPIXEL macro gets the surface size, not DC size.(tangjianbin)
+	* src/api/graphics.cpp
+
+12/31. FIXBUG #3291:(tangjianbin)
+	* src/api/path.cpp
+
+12/31. ENHANCEMENT #8: add MGPlusPathGetPoints() API, Get the special path's
+all vectexs(houhh).  
+	* include/mgplus.h
+	* src/ap/path.cpp    
+
+12/30. ENHANCEMENT #7: add MGPlusTransformPath() and MGPlusTransformPathEx()
+API(houhh).
+	* include/mgplus.h
+	* src/api/graphics.cpp
+
+12/26. ENHANCEMENT #5: add Transform matrix translate/rotate/scale API(tangjianbin).
+	* include/mgplus.h
+	* src/api/graphics.cpp
+
+12/24. ENHANCEMENT #4: add MGPlusGraphicClear() API, Clean up the special
+HGRAPHICS(dengkexi).
+	* include/mgplus.h
+	* src/api/graphics.cpp
+
+12/23. ENHANCEMENT #3: add MGPlusDrawImageFromFileWithPoints() API, draw image
+from special file path(houhh).
+	* include/mgplus.h
+	* src/api/graphics.cpp
+
+12/22. ENHANCEMENT #2: add MGPlusGraphicCopyFrom() and MGPlusGraphicBlendFrom()
+API, Blit between two HGRAPHICS(houhh).
+	* include/mgplus.h
+	* src/api/graphics.cpp
+
+12/20. ENHANCEMENT #1: add MGPlusPathAddRoundRect() API, Get round rect path(houhh).
+	* include/mgplus.h
+	* src/api/path.cpp
+
+12/18: first MGPlus release ver 1.0: (tangjianbin)
+	* src/ap/path.cpp    
+	* src/path/graphics.cpp
+	* src/path/pen.cpp   
+	* src/path/brush.cpp 
+
