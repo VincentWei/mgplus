@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: mGPlus
+Description: A MiniGUI component which provides support for advanced 2D graphics functions.
+Version: @mGPlus_VERSION@
+Requires:
+Libs: -L${libdir} -lmgplus@LIB_SUFFIX@ @PC_LIBS@
+Libs.private:
+Cflags: -I${includedir} @MGPLUS_INCLUDE_LIST@

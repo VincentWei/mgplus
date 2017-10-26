@@ -1,0 +1,6 @@
+src_files= src/agg/agg_arc.cpp src/agg/agg_image_filters.cpp src/agg/agg_trans_single_path.cpp src/agg/agg_vcgen_stroke.cpp src/agg/agg_arrowhead.cpp src/agg/agg_line_aa_basics.cpp src/agg/agg_trans_warp_magnifier.cpp src/agg/agg_vpgen_clip_polygon.cpp src/agg/agg_bezier_arc.cpp src/agg/agg_line_profile_aa.cpp src/agg/agg_vcgen_bspline.cpp src/agg/agg_vpgen_clip_polyline.cpp src/agg/agg_bspline.cpp src/agg/agg_rounded_rect.cpp src/agg/agg_vcgen_contour.cpp src/agg/agg_vpgen_segmentator.cpp src/agg/agg_spline_ctrl.cpp src/agg/agg_curves.cpp src/agg/agg_sqrt_tables.cpp src/agg/agg_vcgen_dash.cpp src/agg/agg_platform_support.cpp src/agg/agg_gamma_ctrl.cpp src/agg/agg_embedded_raster_fonts.cpp src/agg/agg_trans_affine.cpp src/agg/agg_vcgen_markers_term.cpp src/agg/agg_gamma_spline.cpp src/agg/agg_gsv_text.cpp src/agg/agg_trans_double_path.cpp src/agg/agg_vcgen_smooth_poly1.cpp src/agg/interactive_polygon.cpp src/agg/agg_trans_perspective.cpp src/api/path.cpp src/api/graphics.cpp src/api/pen.cpp src/api/brush.cpp src/api/opt_argb32.cpp src/api/opt_rgba32.cpp src/api/opt_bgra32.cpp src/api/opt_abgr32.cpp src/api/opt_rgb24.cpp src/api/opt_bgr24.cpp src/api/opt_rgb555.cpp src/api/opt_rgb565.cpp src/api/lf_fashion.cpp     
+project_name=mgplus
+lib_name=libmgplus
+lib_major_version=1
+lib_minor_version=2
+lib_micro_version=5
