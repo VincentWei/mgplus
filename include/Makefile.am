@@ -1,4 +1,4 @@
-INCLUDES=-I../ -I./
+AM_CPPFLAGS=-I../ -I./
 
 # The directory where the include files will be installed
 libmgplusincludedir = $(includedir)/mgplus

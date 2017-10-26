@@ -1,6 +1,6 @@
-TOP_DIR=..
-INCLUDES=-I.. -I../agg -I../../include -I../agg/font_freetype
 SUBDIRS=
+
+AM_CPPFLAGS=-I.. -I../agg -I../../include -I../agg/font_freetype
 
 noinst_LTLIBRARIES=libapi.la
 
@@ -13,4 +13,4 @@ HDR_FILES = path.h graphics.h pen.h brush.h self_stroke.h
 libapi_la_SOURCES = $(SRC_FILES) $(HDR_FILES)
 LIB_NAME=libapi
 
-EXTRA_DIST = $(SRC_FILES) opt_basic.cpp
+EXTRA_DIST=$(SRC_FILES) opt_basic.cpp

@@ -1,5 +1,5 @@
 TOP_DIR=..
-INCLUDES = -I$(TOP_DIR)/include
+AM_CPPFLAGS = -I$(TOP_DIR)/include
 
 COMMON_SUBDIRS = agg api
 DIST_SUBDIRS = $(COMMON_SUBDIRS) 

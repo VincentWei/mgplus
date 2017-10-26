@@ -1,5 +1,5 @@
-TOP_DIR=..
-INCLUDES =
+AUTOMAKE_OPTIONS=subdir-objects
+AM_CPPFLAGS=
 SUBDIRS=
 
 noinst_LTLIBRARIES = libagg.la

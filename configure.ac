@@ -1,8 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-
-AC_PREREQ(2.52)
-AC_INIT([libmgplus], [1.2.5])
+AC_PREREQ(2.60)
+AC_INIT(libmgplus, 1.2.5)
 AC_CONFIG_SRCDIR(src/agg/agg_platform_support.cpp)
 
 mGPlus_MAJOR_VERSION=1
@@ -18,7 +17,6 @@ AC_SUBST(mGPlus_MICRO_VERSION)
 AC_SUBST(mGPlus_INTERFACE_AGE)
 AC_SUBST(mGPlus_BINARY_AGE)
 AC_SUBST(mGPlus_VERSION)
-
 # libtool versioning
 LT_RELEASE=$mGPlus_MAJOR_VERSION.$mGPlus_MINOR_VERSION.$mGPlus_MICRO_VERSION
 LT_CURRENT=`expr $mGPlus_MICRO_VERSION - $mGPlus_INTERFACE_AGE`
@@ -29,8 +27,6 @@ AC_SUBST(LT_RELEASE)
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
-
-AC_CANONICAL_SYSTEM
 
 AC_DEFINE_UNQUOTED(MGPLUS_MAJOR_VERSION, $mGPlus_MAJOR_VERSION,
             [Major version of mGPlus])
@@ -44,6 +40,14 @@ AC_DEFINE_UNQUOTED(MGPLUS_BINARY_AGE, $mGPlus_BINARY_AGE,
             [Binary age of mGPlus])
 
 dnl ========================================================================
+dnl Need for cross-compiling
+AC_CANONICAL_SYSTEM
+
+dnl ========================================================================
+dnl Init automake
+AM_INIT_AUTOMAKE
+
+dnl ========================================================================
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
@@ -54,7 +58,6 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-AM_INIT_AUTOMAKE(libmgplus,$mGPlus_VERSION,-)
 dnl ========================================================================
 dnl Put the name and version of the package here
 
