@@ -364,7 +364,7 @@ draw_path(HDC hdc, Uint8* pixels, int pitch, int bpp, const RECT* rc, void* ctx)
 
     agg::rasterizer_scanline_aa<>   ras;
     agg::scanline_u8                sl;
-    int i = 0;
+    unsigned int i = 0;
 
     PIXFMT_CUSTOM_TYPE      ren_pixf(pctx->gps->rendering_buff);
     RENDERER_CUSTOM_TYPE    ren_comp(ren_pixf);
@@ -391,7 +391,7 @@ draw_path(HDC hdc, Uint8* pixels, int pitch, int bpp, const RECT* rc, void* ctx)
 
     DASH_TYPE dash_path (pctx->path->m_agg_ps);
     if (pctx->pen->num_dashes > 0) {
-        int i = 0;
+        unsigned int i = 0;
         for (i = 0; i < pctx->pen->num_dashes; i += 2) {
             if ((i+1) < pctx->pen->num_dashes) {
                 dash_path.add_dash (pctx->pen->dash[i], pctx->pen->dash[i+1]);
@@ -1658,7 +1658,7 @@ draw_glyph(HDC hdc, Uint8* pixels, int pitch, int bpp,
                 unsigned cmd;
                 trans.rewind(0);
                 int i = 0;
-                agg::int32* p = (agg::int32*)pctx->lpdata->data;
+//                agg::int32* p = (agg::int32*)pctx->lpdata->data;
                 while(!((cmd = trans.vertex(&x, &y)) == agg::path_cmd_stop)) {
                     //path_adaptor.modify_vertex(i, &x, &y, cmd);
                     i ++;

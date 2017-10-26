@@ -34,12 +34,15 @@
 #include "agg_pixfmt_gray.h"
 #include "agg_alpha_mask_u8.h"
 #include "agg_scanline_p.h"
+#include "agg_platform_support.h"
 
 #include "mgplus.h"
 #include "brush.h"
 #include "pen.h"
 
-#include "agg_platform_support.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* hdc is external */
 #define MP_HDC_EXTERNAL 0
@@ -114,7 +117,7 @@
 
 #endif /* USE_DUFFS_LOOP */
 
-struct MPGraphics;
+typedef struct _MPGraphics MPGraphics;
 
 typedef struct _ctx_copy_
 {
@@ -173,11 +176,10 @@ typedef struct _ctx_draw_glyph_
     LPGLYPHDATA lpdata;
     ARGB        color;
     agg::trans_affine mot;/*matrix of transform*/
-}CTX_DRAW_GLYPH;
+} CTX_DRAW_GLYPH;
 #endif
 
-typedef struct 
-{
+typedef struct _agg_draw_op {
     void (*copy)(HDC hdc, Uint8* pixels, int pitch, int bpp, 
             const RECT* rc, void* ctx);
     void (*clear)(HDC hdc, Uint8* pixels, int pitch, int bpp, 
@@ -194,7 +196,7 @@ typedef struct
     void (*draw_glyph)(HDC hdc, Uint8* pixels, int pitch, int bpp, 
             const RECT* rc, void* ctx);
 #endif
-}agg_draw_op;
+} agg_draw_op;
 
 typedef struct _agg_clip_ras {
     bool state;
@@ -203,9 +205,9 @@ typedef struct _agg_clip_ras {
     agg::rendering_buffer ren_rbuf;
     agg::alpha_mask_gray8 alpha_mask;
     agg::rasterizer_scanline_aa<> ras;
-}agg_clip_ras;
+} agg_clip_ras;
 
-struct MPGraphics
+struct _MPGraphics
 {
     /* the hint. */
     MPRenderingControl      render_control;
@@ -341,4 +343,7 @@ typedef enum _MPHatchStyle
 #endif
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -2,12 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
-AC_INIT([libmgplus], [1.2.3])
+AC_INIT([libmgplus], [1.2.5])
 AC_CONFIG_SRCDIR(src/agg/agg_platform_support.cpp)
 
 mGPlus_MAJOR_VERSION=1
 mGPlus_MINOR_VERSION=2
-mGPlus_MICRO_VERSION=3
+mGPlus_MICRO_VERSION=5
 mGPlus_INTERFACE_AGE=0
 mGPlus_BINARY_AGE=0
 mGPlus_VERSION=$mGPlus_MAJOR_VERSION.$mGPlus_MINOR_VERSION.$mGPlus_MICRO_VERSION
@@ -266,8 +266,9 @@ AC_SUBST(LIB_SUFFIX)
 AC_SUBST(APP_LIBS)
 
 dnl AC_CONFIG_FILES
-AC_OUTPUT([Makefile
+AC_OUTPUT([Makefile mgplus.pc
          include/Makefile
+         cmake/Makefile
          src/Makefile
          src/agg/Makefile
          src/api/Makefile

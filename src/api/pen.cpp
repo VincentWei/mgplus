@@ -8,16 +8,22 @@
  **
  ** Create date: 2008/12/02
  */
+#include <string.h>
+
 #include "pen.h"
-#include <malloc.h>
 
 HPEN MGPlusPenCreate (int width, ARGB rgba)
 {
-    MPPen* pen = (MPPen*) calloc(1, sizeof(MPPen));
+    MPPen* pen = new MPPen;
+
     if (!pen)
         return MP_INV_HANDLE;
+
+    memset ((void *)pen, 0x00, sizeof (MPPen));
+
     if (width < 1)
         width = 1;
+
     pen->width = width;
     pen->rgba = rgba;
 
@@ -64,13 +70,16 @@ MPStatus MGPlusPenSetDashes (HPEN pen, int dash_phase,
 {
     int i = 0;
     MPPen *ppen= (MPPen *)pen;
+
     if (!ppen || !dash_list || dash_len < 0)
         return MP_GENERIC_ERROR;
 
-    ppen->dash = (unsigned char*) malloc(sizeof(char) * dash_len);
+    ppen->dash = new unsigned char[dash_len];
+
     for (i = 0; i < dash_len; i++) {
         ppen->dash[i] = dash_list[i];
     }
+
     ppen->num_dashes  = dash_len;
     ppen->dash_phase  = dash_phase;
 
@@ -80,6 +89,7 @@ MPStatus MGPlusPenSetDashes (HPEN pen, int dash_phase,
 MPStatus MGPlusPenSetWidth (HPEN pen, int width)
 {
     MPPen *ppen= (MPPen *)pen;
+
     if (!ppen)
         return MP_GENERIC_ERROR;
 
@@ -93,11 +103,15 @@ MPStatus MGPlusPenSetWidth (HPEN pen, int width)
 MPStatus MGPlusPenDelete (HPEN pen)
 {
     MPPen *ppen=(MPPen *)pen;
+
     if (!ppen)
         return MP_GENERIC_ERROR;
+
     if (ppen->dash) {
-        free (ppen->dash);
+        delete [] ppen->dash;
     }
-    free (ppen);
+
+    delete ppen;
+
     return MP_OK;
 }

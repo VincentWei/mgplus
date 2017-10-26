@@ -123,92 +123,6 @@ extern WINDOW_ELEMENT_RENDERER wnd_rdr_fashion;
 static int get_window_border(HWND hWnd, int dwStyle, int win_type);
 static int calc_we_metrics(HWND hWnd, LFRDR_WINSTYLEINFO* style_info, int which);
 
-enum 
-{
-    BTN_NORMAL,
-    BTN_HILITE,
-    BTN_PRESSED,
-    BTN_DISABLE,
-    BTN_CHECKED,
-    BTN_INDETERMINATE,
-    MAX_BTN_STATE
-};
-
-//! @brief HDC cache manager.
-//!
-//! @description 
-class CacheManager
-{
-    public:
-        typedef HDC  Data;
-        struct Area
-        {
-            Area(int w, int h) : w_(w), h_(h)
-            {}
-            bool operator < (const Area & rhs) const
-            {
-                return ((w_ != rhs.w_) ? w_ < rhs.w_ : h_ < rhs.h_);
-            }
-
-            int w_;
-            int h_;
-        };
-        typedef Area Key;
-
-        /// constructor of CacheManager
-        CacheManager(size_t cache_size = 8) : cache_size_(cache_size)
-        {
-            pthread_mutex_init(&mutex_, NULL);
-            if (0 == cache_size_) cache_size_ = 1;
-        }
-
-        /// destructor of CacheManager
-        ~CacheManager()
-        {
-            CacheContainer::iterator idx = caches.begin();
-            CacheContainer::iterator end = caches.end();
-            for (; idx != end; ++idx)
-            {
-                DeleteMemDC(idx->second);
-            }
-            caches.clear();
-            pthread_mutex_destroy(&mutex_);
-        }
-
-        Data find(const Key & key)
-        {
-            Data hdc = HDC_INVALID;
-            pthread_mutex_lock(&mutex_);
-            CacheContainer::iterator itr = caches.find(key);
-            if (caches.end() != itr) {
-                hdc = itr->second;
-            }
-            pthread_mutex_unlock(&mutex_);
-            return hdc;
-        }
-
-        void insert(const Key & key, Data hdc)
-        {
-            pthread_mutex_lock(&mutex_);
-            if (caches.size() >= cache_size_)
-            {
-                DeleteMemDC(caches.begin()->second);
-                caches.erase(caches.begin());
-            }
-            bool ret = 
-                caches.insert(CacheContainer::value_type(key, hdc)).second;
-            pthread_mutex_unlock(&mutex_);
-            assert(ret);
-        }
-
-    private:
-        typedef std::map<Key, Data> CacheContainer;
-
-        size_t cache_size_;
-        pthread_mutex_t mutex_;
-        CacheContainer caches;
-}; /* -----  end of class CacheManager  ----- */
-
 static inline void linear_gradient_draw (HDC hdc, MPLinearGradientMode mode, 
         RECT *rc, gal_pixel *pixel, int pixel_num)
 {
@@ -1099,9 +1013,6 @@ static void
 draw_arrow(HWND hWnd, HDC hdc, const RECT* pRect, DWORD color, int status)
 {
     FUNCTION_SCOPE_TIMING();
-    static CacheManager s_Harrow_cache[MAX_BTN_STATE];
-    static CacheManager s_Varrow_cache[MAX_BTN_STATE];
-    int  state_idx = BTN_NORMAL;
 
     DWORD       c1, c2;
     int         w, h;
@@ -1145,7 +1056,6 @@ draw_arrow(HWND hWnd, HDC hdc, const RECT* pRect, DWORD color, int status)
                 
                 pixels2[0] = mp_gradient_color(c1, LFRDR_3DBOX_COLOR_LIGHTER, 100);
                 pixels2[1] = mp_gradient_color(c1, LFRDR_3DBOX_COLOR_LIGHTER, 200);
-                state_idx = BTN_HILITE;
                 break; 
             case LFRDR_BTN_STATUS_PRESSED:
                 pixels[0] = mp_gradient_color(c2, LFRDR_3DBOX_COLOR_LIGHTER, 200);
@@ -1153,10 +1063,8 @@ draw_arrow(HWND hWnd, HDC hdc, const RECT* pRect, DWORD color, int status)
                 
                 pixels2[0] = mp_gradient_color(c1, LFRDR_3DBOX_COLOR_DARKER, 100);
                 pixels2[1] = mp_gradient_color(c1, LFRDR_3DBOX_COLOR_LIGHTER, 100);
-                state_idx = BTN_PRESSED;
                 break;
             case LFRDR_BTN_STATUS_DISABLED:
-                state_idx = BTN_DISABLE;
             case LFRDR_BTN_STATUS_NORMAL:
             default:
                 pixels[0] = mp_gradient_color(c2, LFRDR_3DBOX_COLOR_LIGHTER, 250);
@@ -1167,19 +1075,10 @@ draw_arrow(HWND hWnd, HDC hdc, const RECT* pRect, DWORD color, int status)
                 break;
         }
 
-        CacheManager::Area arrow_area(w, h);
         switch (status & LFRDR_ARROW_DIRECT_MASK)
         {
             case LFRDR_ARROW_UP:
             case LFRDR_ARROW_DOWN:
-            {
-                HDC dc_cached = s_Varrow_cache[state_idx].find(arrow_area);
-                if (HDC_INVALID != dc_cached)
-                {
-                    BitBlt(dc_cached, 0, 0, arrow_area.w_, arrow_area.h_,
-                            hdc, rc_tmp.left, rc_tmp.top, 0);
-                }
-                else
                 {
                     rc_tmp2.top = 1;
                     rc_tmp2.left = 1;
@@ -1207,31 +1106,13 @@ draw_arrow(HWND hWnd, HDC hdc, const RECT* pRect, DWORD color, int status)
                     MGPlusPathAddRectangleI (path, rc_tmp3.left, rc_tmp3.top, RECTW (rc_tmp3), RECTH (rc_tmp3));
                     MGPlusFillPath (graphic, brush, path); 
 
-                    HDC cache_dc = CreateCompatibleDCEx(hdc, arrow_area.w_, arrow_area.h_);
-                    if (HDC_INVALID != cache_dc)
-                    {
-                        MGPlusGraphicSave(graphic, cache_dc, 0, 0, 0, 0, 0, 0);
-                        BitBlt(cache_dc, 0, 0, arrow_area.w_, arrow_area.h_, 
-                                hdc, rc_tmp.left, rc_tmp.top, 0);
-                        s_Varrow_cache[state_idx].insert(arrow_area, cache_dc);
-                    } else {
-                        MGPlusGraphicSave (graphic, hdc, 0, 0,\
-                                RECTW (rc_tmp), RECTH (rc_tmp),\
-                                rc_tmp.left, rc_tmp.top);
-                    }
+                    MGPlusGraphicSave (graphic, hdc, 0, 0,\
+                            RECTW (rc_tmp), RECTH (rc_tmp),\
+                            rc_tmp.left, rc_tmp.top);
                 }
-            }
-            break;
+                break;
             case LFRDR_ARROW_LEFT:
             case LFRDR_ARROW_RIGHT:
-            {
-                HDC dc_cached = s_Harrow_cache[state_idx].find(arrow_area);
-                if (HDC_INVALID != dc_cached)
-                {
-                    BitBlt(dc_cached, 0, 0, arrow_area.w_, arrow_area.h_,
-                            hdc, rc_tmp.left, rc_tmp.top, 0);
-                }
-                else
                 {
                     rc_tmp2.top = 1;
                     rc_tmp2.left = 1;
@@ -1260,23 +1141,13 @@ draw_arrow(HWND hWnd, HDC hdc, const RECT* pRect, DWORD color, int status)
                     MGPlusPathAddRectangleI (path, rc_tmp3.left, rc_tmp3.top, RECTW (rc_tmp3), RECTH (rc_tmp3));
                     MGPlusFillPath (graphic, brush, path); 
 
-                    HDC cache_dc = CreateCompatibleDCEx(hdc, arrow_area.w_, arrow_area.h_);
-                    if (HDC_INVALID != cache_dc)
-                    {
-                        MGPlusGraphicSave(graphic, cache_dc, 0, 0, 0, 0, 0, 0);
-                        BitBlt(cache_dc, 0, 0, arrow_area.w_, arrow_area.h_, 
-                                hdc, rc_tmp.left, rc_tmp.top, 0);
-                        s_Harrow_cache[state_idx].insert(arrow_area, cache_dc);
-                    } else {
-                        MGPlusGraphicSave (graphic, hdc, 0, 0,\
-                                RECTW (rc_tmp), RECTH (rc_tmp),\
-                                rc_tmp.left, rc_tmp.top);
-                    }
+                    MGPlusGraphicSave (graphic, hdc, 0, 0,\
+                            RECTW (rc_tmp), RECTH (rc_tmp),\
+                            rc_tmp.left, rc_tmp.top);
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
     }
 
@@ -1585,8 +1456,6 @@ draw_push_button (HWND hWnd, HDC hdc, const RECT* pRect,
         DWORD color1, DWORD color2, int status)
 {
     FUNCTION_SCOPE_TIMING();
-    static CacheManager s_button_cache[MAX_BTN_STATE];
-    int state_idx = BTN_NORMAL;
 
     DWORD   c1, tmpcolor;
     RECT    frRect, upRect, downRect;
@@ -1623,14 +1492,12 @@ draw_push_button (HWND hWnd, HDC hdc, const RECT* pRect,
 
             downpixel [0] = mp_gradient_color (c1, LFRDR_3DBOX_COLOR_LIGHTER, 50);
             downpixel [1] = mp_gradient_color (c1, LFRDR_3DBOX_COLOR_LIGHTER, 150);
-            state_idx = BTN_CHECKED;
         } else if (STATUS_GET_CHECK (status) == BST_INDETERMINATE) {
             /*Use color1*/
             uppixel [1] = tmpcolor;
             uppixel [0] = uppixel [1];
 
             downpixel [0] = downpixel[1] = uppixel[0];
-            state_idx = BTN_INDETERMINATE;
         } else {
             flag = FALSE;
         }
@@ -1643,7 +1510,6 @@ draw_push_button (HWND hWnd, HDC hdc, const RECT* pRect,
             downpixel [0] = mp_gradient_color (c1, LFRDR_3DBOX_COLOR_LIGHTER, 50);
             downpixel [1] = mp_gradient_color (c1, LFRDR_3DBOX_COLOR_LIGHTER, 150);
 
-            state_idx = BTN_PRESSED;
         } else if (GET_BTN_POSE_STATUS(status) == BST_HILITE) {
             /*Draw hilight status*/
             uppixel [0] = mp_gradient_color (tmpcolor, LFRDR_3DBOX_COLOR_LIGHTER, 250);
@@ -1651,13 +1517,11 @@ draw_push_button (HWND hWnd, HDC hdc, const RECT* pRect,
 
             downpixel [0] = mp_gradient_color (c1, LFRDR_3DBOX_COLOR_LIGHTER, 90);
             downpixel [1] = mp_gradient_color (c1, LFRDR_3DBOX_COLOR_LIGHTER, 180);
-            state_idx = BTN_HILITE;
         } else if (GET_BTN_POSE_STATUS(status) == BST_DISABLE) {
             uppixel [1] = tmpcolor;
             uppixel [0] = uppixel[1];
 
             downpixel [0] = downpixel[1] = uppixel[0];
-            state_idx = BTN_DISABLE;
         } else {
             flag = FALSE;
         }
@@ -1672,79 +1536,61 @@ draw_push_button (HWND hWnd, HDC hdc, const RECT* pRect,
         downpixel [1] = mp_gradient_color (c1, LFRDR_3DBOX_COLOR_LIGHTER, 150);
     }
 
-    CacheManager::Area btn_area(RECTW(*pRect), RECTH(*pRect));
-    HDC dc_cached = s_button_cache[state_idx].find(btn_area);
-    if (HDC_INVALID != dc_cached)
-    {
-        BitBlt(dc_cached, 0, 0, btn_area.w_, btn_area.h_,
-                hdc, pRect->left, pRect->top, 0);
-    } else {
-        HPATH path;
-        HBRUSH brush;
-        HGRAPHICS graphic = MGPlusGraphicCreate(btn_area.w_, btn_area.h_);
-        if (!graphic)
-            return;
+    HPATH path;
+    HBRUSH brush;
+    HGRAPHICS graphic = MGPlusGraphicCreate(RECTW(*pRect), RECTH(*pRect));
+    if (!graphic)
+        return;
 
-        BitBlt (hdc, pRect->left, pRect->top, RECTW (*pRect),
-                RECTH (*pRect), MGPlusGetGraphicDC (graphic),
-                0, 0, 0);
+    BitBlt (hdc, pRect->left, pRect->top, RECTW (*pRect),
+            RECTH (*pRect), MGPlusGetGraphicDC (graphic),
+            0, 0, 0);
 
-        brush = MGPlusBrushCreate(MP_BRUSH_TYPE_LINEARGRADIENT); 
-        if (!brush){
-            MGPlusGraphicDelete(graphic);
-            return;
-        }
-
-        path = MGPlusPathCreate(MP_PATH_FILL_MODE_WINDING);
-        if (!path) {
-            MGPlusGraphicDelete(graphic);
-            MGPlusBrushDelete(brush);
-            return;
-        }
-
-        MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_VERTICAL);
-
-        upRect.left = 1;
-        upRect.right = frRect.right - pRect->left + 1;
-        upRect.top = 1;
-        upRect.bottom = (RECTH(*pRect) >> 1) - 3;
-
-        downRect.left = upRect.left;
-        downRect.right = upRect.right;
-        downRect.top = upRect.bottom;
-        downRect.bottom = RECTH (*pRect);
-
-        MGPlusSetLinearGradientBrushRect (brush, &upRect);
-        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)uppixel, 2); 
-        MGPlusPathAddRectangleI (path, upRect.left, upRect.top, RECTW (upRect), 
-                RECTH (upRect));
-        MGPlusFillPath (graphic, brush, path); 
-        MGPlusPathReset (path);
-
-        MGPlusSetLinearGradientBrushRect (brush, &downRect);
-        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)downpixel, 2); 
-        MGPlusPathAddRectangleI (path, downRect.left, downRect.top, RECTW (downRect), 
-                RECTH (downRect));
-        MGPlusFillPath (graphic, brush, path); 
-
-        HDC cache_dc = CreateCompatibleDCEx(hdc, btn_area.w_, btn_area.h_);
-        if (HDC_INVALID != cache_dc)
-        {
-            MGPlusGraphicSave (graphic, cache_dc, 0, 0, 0, 0, 0, 0);
-            BitBlt(cache_dc, 0, 0, btn_area.w_, btn_area.h_, 
-                    hdc, upRect.left - 1, upRect.top - 1, 0);
-            s_button_cache[state_idx].insert(btn_area, cache_dc);
-        } else {
-            MGPlusGraphicSave (graphic, hdc, 0, 0, 0, 0, 
-                    upRect.left - 1, upRect.top - 1);
-        }
-
-        MGPlusPathDelete (path);
-        MGPlusBrushDelete (brush);
-        MGPlusGraphicDelete (graphic);
-
+    brush = MGPlusBrushCreate(MP_BRUSH_TYPE_LINEARGRADIENT); 
+    if (!brush){
+        MGPlusGraphicDelete(graphic);
+        return;
     }
-    // DK: Can't cache because the border line out of cache dc range.
+
+    path = MGPlusPathCreate(MP_PATH_FILL_MODE_WINDING);
+    if (!path) {
+        MGPlusGraphicDelete(graphic);
+        MGPlusBrushDelete(brush);
+        return;
+    }
+
+    MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_VERTICAL);
+
+    upRect.left = 1;
+    upRect.right = frRect.right - pRect->left + 1;
+    upRect.top = 1;
+    upRect.bottom = (RECTH(*pRect) >> 1) - 3;
+
+    downRect.left = upRect.left;
+    downRect.right = upRect.right;
+    downRect.top = upRect.bottom;
+    downRect.bottom = RECTH (*pRect);
+
+    MGPlusSetLinearGradientBrushRect (brush, &upRect);
+    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)uppixel, 2); 
+    MGPlusPathAddRectangleI (path, upRect.left, upRect.top, RECTW (upRect), 
+            RECTH (upRect));
+    MGPlusFillPath (graphic, brush, path); 
+    MGPlusPathReset (path);
+
+    MGPlusSetLinearGradientBrushRect (brush, &downRect);
+    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)downpixel, 2); 
+    MGPlusPathAddRectangleI (path, downRect.left, downRect.top, RECTW (downRect), 
+            RECTH (downRect));
+    MGPlusFillPath (graphic, brush, path); 
+
+    MGPlusGraphicSave (graphic, hdc, 0, 0, 0, 0, 
+            upRect.left - 1, upRect.top - 1);
+
+    MGPlusPathDelete (path);
+    MGPlusBrushDelete (brush);
+    MGPlusGraphicDelete (graphic);
+
     //draw border top
     SetPenColor (hdc, DWORD2PIXEL(hdc, c1));
     MoveTo (hdc, frRect.left + corner, frRect.top);
@@ -2881,8 +2727,6 @@ static void draw_border (HWND hWnd, HDC hdc, BOOL is_active)
 static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
 {
     FUNCTION_SCOPE_TIMING();
-    static CacheManager active_cacher;
-    static CacheManager inactive_cacher;
     int     font_h;
     gal_pixel text_color, old_text_color;
     PLOGFONT cap_font, old_font;
@@ -2891,7 +2735,6 @@ static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
     int     win_w;
     int     border;
     int  ncbutton_w = 0;
-    bool is_used_cache = false;
 
     DWORD   ca = 0, cb = 0;
     RECT    rect_line;
@@ -2901,14 +2744,14 @@ static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
     HBRUSH  brush=NULL;
     SetRectEmpty (&icon_rect);
     win_info = GetWindowInfo(hWnd);
-    
+
     if (!(win_info->dwStyle & WS_CAPTION))
         return;
     if(calc_we_area(hWnd, HT_CAPTION, &rect) == -1)
         return;
     if(RECTH(rect) <= 1 || RECTW(rect) <= 0)
         return;
-    
+
     cap_font = (PLOGFONT)GetWindowElementAttr(hWnd, WE_FONT_CAPTION);
 
     HGRAPHICS graphic = MGPlusGraphicCreate (RECTW (rect), RECTH (rect));
@@ -2917,216 +2760,185 @@ static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
 
     HDC hdc_graphic = MGPlusGetGraphicDC (graphic);
 
-    CacheManager::Area area(RECTW(rect), RECTH(rect));
     if(is_active) {
         text_color = GetWindowElementPixelEx (hWnd, hdc_graphic, WE_FGC_ACTIVE_CAPTION);
         ca = GetWindowElementAttr (hWnd, WE_BGCA_ACTIVE_CAPTION);
         cb = GetWindowElementAttr (hWnd, WE_BGCB_ACTIVE_CAPTION);
-
-        HDC cache = active_cacher.find(area);
-        if (HDC_INVALID != cache)
-        {
-            BitBlt(cache, 0, 0, area.w_, area.h_, hdc_graphic, 0, 0, 0);
-            is_used_cache = true;
-        }
     } else {
         text_color = GetWindowElementPixelEx (hWnd, hdc_graphic, WE_FGC_INACTIVE_CAPTION);
         ca = GetWindowElementAttr (hWnd, WE_BGCA_INACTIVE_CAPTION);
         cb = GetWindowElementAttr (hWnd, WE_BGCB_INACTIVE_CAPTION);
-
-        HDC cache = inactive_cacher.find(area);
-        if (HDC_INVALID != cache)
-        {
-            BitBlt(cache, 0, 0, area.w_, area.h_, hdc_graphic, 0, 0, 0);
-            is_used_cache = true;
-        }
     }
 
-    if (!is_used_cache)
+    BitBlt (hdc, rect.left, rect.top, RECTW (rect), RECTH (rect), hdc_graphic, 0, 0, 0);
+    /** draw backgroup right */
+    pixels[0] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_LIGHTER, 180);
+    pixels[1] = MPMakeARGB (GetRValue(cb), GetGValue(cb), GetBValue(cb), GetAValue(cb));
+    brush = MGPlusBrushCreate(MP_BRUSH_TYPE_LINEARGRADIENT); 
+
+    if (!brush){
+        MGPlusGraphicDelete(graphic);
+        return;
+    }
+    path = MGPlusPathCreate(MP_PATH_FILL_MODE_WINDING);
+    if (!path) {
+        MGPlusGraphicDelete(graphic);
+        MGPlusBrushDelete(brush);
+        return;
+    }
+
+    RECT tmp_rect;
+
+    tmp_rect.left = tmp_rect.top = 0;
+    tmp_rect.right = RECTW (rect);
+    tmp_rect.bottom = RECTH (rect);
+
+    MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_VERTICAL);
+    MGPlusSetLinearGradientBrushRect(brush, &tmp_rect);
+    MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels, 2); 
+
+    MGPlusPathAddRectangleI(path, 0, 0, RECTW (tmp_rect), RECTH (tmp_rect));
+    MGPlusFillPath(graphic, brush, path); 
+    MGPlusPathReset (path);
+
+    /** draw backgroup left */
+    memset (&rcTmp, 0, sizeof (RECT));
+    if (win_info->dwStyle & WS_MINIMIZEBOX) {
+        calc_we_area(hWnd, HT_MINBUTTON, &rcTmp);
+    }
+    else if (win_info->dwStyle & WS_MAXIMIZEBOX) {
+        calc_we_area(hWnd, HT_MAXBUTTON, &rcTmp);
+    }
+    else {
+        calc_we_area(hWnd, HT_CLOSEBUTTON, &rcTmp);
+    }
+
+    pixels[0] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_LIGHTER, 80);
+    pixels[1] = mp_gradient_color(cb, LFRDR_3DBOX_COLOR_DARKER, 60);
+
+    MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_VERTICAL);
+    MGPlusSetLinearGradientBrushRect(brush, &tmp_rect);
+    MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels, 2); 
+
+    MGPlusPathAddRectangleI(path, 0, 0, RECTW (tmp_rect), RECTH (tmp_rect));
+    MGPlusFillPath(graphic, brush, path); 
+    MGPlusPathReset (path);
+
+    /** draw backgroup 3 */
+
+    /** draw the first dark line */
+    pixels[0] = mp_gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40);
+    pixels[1] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_LIGHTER, 65);
+
+    RECT rc_tmp_up;
+    rc_tmp_up.left = rect_line.left = tmp_rect.left;
+    rc_tmp_up.top = rect_line.top = tmp_rect.top + 2;
+    rc_tmp_up.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 
+        (tmp_rect.bottom - tmp_rect.top) - 10;
+    rc_tmp_up.bottom = rect_line.bottom = rect_line.top + 1;
+
+    rect_line.left = rect_line.right - 10;
+
+    MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_HORIZONTAL);
+    MGPlusSetLinearGradientBrushRect(brush, &rect_line);
+    MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels, 2); 
+
+    MGPlusPathAddRectangleI(path, rect_line.left, rect_line.top,
+            RECTW (rect_line), RECTH (rect_line));
+    MGPlusFillPath(graphic, brush, path); 
+    MGPlusPathReset(path);
+
+    /* draw the second dark line */
+    RECT rc_tmp_down;
+    rc_tmp_down.left = rect_line.left = tmp_rect.left;
+    rc_tmp_down.top = rect_line.top = tmp_rect.bottom - 4;
+    rc_tmp_down.bottom = rect_line.bottom = rect_line.top + 1;
+    rc_tmp_down.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 20;
+
+    pixels [0] = mp_gradient_color (ca, LFRDR_3DBOX_COLOR_DARKER, 100);
+    pixels [1] = mp_gradient_color (cb, LFRDR_3DBOX_COLOR_DARKER, 50);
+
+    rect_line.left = rect_line.right - 10;
+
+    MGPlusSetLinearGradientBrushRect (brush, &rect_line);
+    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
+
+    MGPlusPathAddRectangleI (path, rect_line.left, rect_line.top,
+            RECTW (rect_line), RECTH (rect_line));
+    MGPlusFillPath (graphic, brush, path); 
+    MGPlusPathReset (path);
+
+    /** draw the third light line */
+    pixels [0] = mp_gradient_color (cb, LFRDR_3DBOX_COLOR_LIGHTER, 100);
+    pixels [1] = mp_gradient_color (ca, LFRDR_3DBOX_COLOR_LIGHTER, 70);
+
+    RECT rc_tmp_up_small;
+
+    rc_tmp_up_small.left = rect_line.left = tmp_rect.left;
+    rc_tmp_up_small.top = rect_line.top = tmp_rect.top + 3;
+    rc_tmp_up_small.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 
+        (rect.bottom - rect.top) - 10;
+    rc_tmp_up_small.bottom = rect_line.bottom = rect_line.top + 1;
+
+    rect_line.left = rect_line.right - 10;
+
+    MGPlusSetLinearGradientBrushRect (brush, &rect_line);
+    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
+
+    MGPlusPathAddRectangleI (path, rect_line.left, rect_line.top,
+            RECTW (rect_line), RECTH (rect_line));
+    MGPlusFillPath (graphic, brush, path); 
+    MGPlusPathReset (path);
+
+    /** draw the fourth light line */
+    RECT rc_down_small;
+    rc_down_small.left = rect_line.left = tmp_rect.left;
+    rc_down_small.top = rect_line.top = tmp_rect.bottom - 3;
+    rc_down_small.bottom = rect_line.bottom = rect_line.top + 1;
+    rc_down_small.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 20;
+    /** FIXE ME */
+    pixels[0] = mp_gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40);
+    pixels[1] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_DARKER, 55);
+
+    rect_line.left = rect_line.right - 10;
+
+    MGPlusSetLinearGradientBrushRect (brush, &rect_line);
+    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
+
+    MGPlusPathAddRectangleI (path, rect_line.left, rect_line.top, \
+            RECTW (rect_line), RECTH (rect_line));
+    MGPlusFillPath (graphic, brush, path); 
+    MGPlusPathReset (path);
+
+    SetPenColor (hdc_graphic, 
+            DWORD2PIXEL (hdc_graphic, 
+                gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40)));
+    MoveTo (hdc_graphic, rc_tmp_up.left, rc_tmp_up.top);
+    LineTo (hdc_graphic, rc_tmp_up.right - 10, rc_tmp_up.top);
+    SetPenColor (hdc_graphic, 
+            DWORD2PIXEL (hdc_graphic, 
+                gradient_color(cb, LFRDR_3DBOX_COLOR_DARKER, 100)));
+    MoveTo (hdc_graphic, rc_tmp_down.left, rc_tmp_down.top);
+    LineTo (hdc_graphic, rc_tmp_down.right - 10, rc_tmp_down.top);
+    SetPenColor (hdc_graphic, 
+            DWORD2PIXEL (hdc_graphic, 
+                gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 100)));
+    MoveTo (hdc_graphic, rc_tmp_up_small.left, rc_tmp_up_small.top);
+    LineTo (hdc_graphic, rc_tmp_up_small.right - 10, rc_tmp_up_small.top);
+    SetPenColor (hdc_graphic, 
+            DWORD2PIXEL (hdc_graphic, 
+                gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40)));
+    MoveTo (hdc_graphic, rc_down_small.left, rc_down_small.top);
+    LineTo (hdc_graphic, rc_down_small.right - 10, rc_down_small.top);
+
+    /** draw icon */
+    if(win_info->hIcon)
     {
-        BitBlt (hdc, rect.left, rect.top, RECTW (rect), RECTH (rect), hdc_graphic, 0, 0, 0);
-        /** draw backgroup right */
-        pixels[0] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_LIGHTER, 180);
-        pixels[1] = MPMakeARGB (GetRValue(cb), GetGValue(cb), GetBValue(cb), GetAValue(cb));
-        brush = MGPlusBrushCreate(MP_BRUSH_TYPE_LINEARGRADIENT); 
-
-        if (!brush){
-            MGPlusGraphicDelete(graphic);
-            return;
-        }
-        path = MGPlusPathCreate(MP_PATH_FILL_MODE_WINDING);
-        if (!path) {
-            MGPlusGraphicDelete(graphic);
-            MGPlusBrushDelete(brush);
-            return;
-        }
-
-        RECT tmp_rect;
-
-        tmp_rect.left = tmp_rect.top = 0;
-        tmp_rect.right = RECTW (rect);
-        tmp_rect.bottom = RECTH (rect);
-
-        MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_VERTICAL);
-        MGPlusSetLinearGradientBrushRect(brush, &tmp_rect);
-        MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels, 2); 
-
-        MGPlusPathAddRectangleI(path, 0, 0, RECTW (tmp_rect), RECTH (tmp_rect));
-        MGPlusFillPath(graphic, brush, path); 
-        MGPlusPathReset (path);
-
-        /** draw backgroup left */
-        memset (&rcTmp, 0, sizeof (RECT));
-        if (win_info->dwStyle & WS_MINIMIZEBOX) {
-            calc_we_area(hWnd, HT_MINBUTTON, &rcTmp);
-        }
-        else if (win_info->dwStyle & WS_MAXIMIZEBOX) {
-            calc_we_area(hWnd, HT_MAXBUTTON, &rcTmp);
-        }
-        else {
-            calc_we_area(hWnd, HT_CLOSEBUTTON, &rcTmp);
-        }
-
-        pixels[0] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_LIGHTER, 80);
-        pixels[1] = mp_gradient_color(cb, LFRDR_3DBOX_COLOR_DARKER, 60);
-
-        MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_VERTICAL);
-        MGPlusSetLinearGradientBrushRect(brush, &tmp_rect);
-        MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels, 2); 
-
-        MGPlusPathAddRectangleI(path, 0, 0, RECTW (tmp_rect), RECTH (tmp_rect));
-        MGPlusFillPath(graphic, brush, path); 
-        MGPlusPathReset (path);
-
-        /** draw backgroup 3 */
-
-        /** draw the first dark line */
-        pixels[0] = mp_gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40);
-        pixels[1] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_LIGHTER, 65);
-
-        RECT rc_tmp_up;
-        rc_tmp_up.left = rect_line.left = tmp_rect.left;
-        rc_tmp_up.top = rect_line.top = tmp_rect.top + 2;
-        rc_tmp_up.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 
-            (tmp_rect.bottom - tmp_rect.top) - 10;
-        rc_tmp_up.bottom = rect_line.bottom = rect_line.top + 1;
-
-        rect_line.left = rect_line.right - 10;
-
-        MGPlusSetLinearGradientBrushMode(brush, MP_LINEAR_GRADIENT_MODE_HORIZONTAL);
-        MGPlusSetLinearGradientBrushRect(brush, &rect_line);
-        MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels, 2); 
-
-        MGPlusPathAddRectangleI(path, rect_line.left, rect_line.top,
-                RECTW (rect_line), RECTH (rect_line));
-        MGPlusFillPath(graphic, brush, path); 
-        MGPlusPathReset(path);
-
-        /* draw the second dark line */
-        RECT rc_tmp_down;
-        rc_tmp_down.left = rect_line.left = tmp_rect.left;
-        rc_tmp_down.top = rect_line.top = tmp_rect.bottom - 4;
-        rc_tmp_down.bottom = rect_line.bottom = rect_line.top + 1;
-        rc_tmp_down.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 20;
-
-        pixels [0] = mp_gradient_color (ca, LFRDR_3DBOX_COLOR_DARKER, 100);
-        pixels [1] = mp_gradient_color (cb, LFRDR_3DBOX_COLOR_DARKER, 50);
-
-        rect_line.left = rect_line.right - 10;
-
-        MGPlusSetLinearGradientBrushRect (brush, &rect_line);
-        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
-
-        MGPlusPathAddRectangleI (path, rect_line.left, rect_line.top,
-                RECTW (rect_line), RECTH (rect_line));
-        MGPlusFillPath (graphic, brush, path); 
-        MGPlusPathReset (path);
-
-        /** draw the third light line */
-        pixels [0] = mp_gradient_color (cb, LFRDR_3DBOX_COLOR_LIGHTER, 100);
-        pixels [1] = mp_gradient_color (ca, LFRDR_3DBOX_COLOR_LIGHTER, 70);
-
-        RECT rc_tmp_up_small;
-
-        rc_tmp_up_small.left = rect_line.left = tmp_rect.left;
-        rc_tmp_up_small.top = rect_line.top = tmp_rect.top + 3;
-        rc_tmp_up_small.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 
-            (rect.bottom - rect.top) - 10;
-        rc_tmp_up_small.bottom = rect_line.bottom = rect_line.top + 1;
-
-        rect_line.left = rect_line.right - 10;
-
-        MGPlusSetLinearGradientBrushRect (brush, &rect_line);
-        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
-
-        MGPlusPathAddRectangleI (path, rect_line.left, rect_line.top,
-                RECTW (rect_line), RECTH (rect_line));
-        MGPlusFillPath (graphic, brush, path); 
-        MGPlusPathReset (path);
-
-        /** draw the fourth light line */
-        RECT rc_down_small;
-        rc_down_small.left = rect_line.left = tmp_rect.left;
-        rc_down_small.top = rect_line.top = tmp_rect.bottom - 3;
-        rc_down_small.bottom = rect_line.bottom = rect_line.top + 1;
-        rc_down_small.right = rect_line.right = rect_line.left + (rcTmp.left - rect.left) - 10 - 20;
-        /** FIXE ME */
-        pixels[0] = mp_gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40);
-        pixels[1] = mp_gradient_color(ca, LFRDR_3DBOX_COLOR_DARKER, 55);
-
-        rect_line.left = rect_line.right - 10;
-
-        MGPlusSetLinearGradientBrushRect (brush, &rect_line);
-        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
-
-        MGPlusPathAddRectangleI (path, rect_line.left, rect_line.top, \
-                RECTW (rect_line), RECTH (rect_line));
-        MGPlusFillPath (graphic, brush, path); 
-        MGPlusPathReset (path);
-
-        SetPenColor (hdc_graphic, 
-                DWORD2PIXEL (hdc_graphic, 
-                    gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40)));
-
-        MoveTo (hdc_graphic, rc_tmp_up.left, rc_tmp_up.top);
-        LineTo (hdc_graphic, rc_tmp_up.right - 10, rc_tmp_up.top);
-        SetPenColor (hdc_graphic, 
-                DWORD2PIXEL (hdc_graphic, 
-                    gradient_color(cb, LFRDR_3DBOX_COLOR_DARKER, 100)));
-        MoveTo (hdc_graphic, rc_tmp_down.left, rc_tmp_down.top);
-        LineTo (hdc_graphic, rc_tmp_down.right - 10, rc_tmp_down.top);
-        SetPenColor (hdc_graphic, 
-                DWORD2PIXEL (hdc_graphic, 
-                    gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 100)));
-        MoveTo (hdc_graphic, rc_tmp_up_small.left, rc_tmp_up_small.top);
-        LineTo (hdc_graphic, rc_tmp_up_small.right - 10, rc_tmp_up_small.top);
-
-        SetPenColor (hdc_graphic, 
-                DWORD2PIXEL (hdc_graphic, 
-                    gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 40)));
-        MoveTo (hdc_graphic, rc_down_small.left, rc_down_small.top);
-        LineTo (hdc_graphic, rc_down_small.right - 10, rc_down_small.top);
-
-        /** draw icon */
-        if(win_info->hIcon)
-        {
-            if(calc_we_area(hWnd, HT_ICON, &icon_rect) != -1)
-                DrawIcon(hdc_graphic, (icon_rect.left - rect.left), (icon_rect.top - rect.top),
-                        RECTW(icon_rect), RECTH(icon_rect), win_info->hIcon);
-        }
-
-        /* Cache the caption unless text. */
-        HDC cache_dc = CreateCompatibleDCEx(hdc, area.w_, area.h_);
-        if (HDC_INVALID != cache_dc)
-        {
-            BitBlt(hdc_graphic, 0, 0, area.w_, area.h_, cache_dc, 0, 0, 0);
-            if(is_active) {
-                active_cacher.insert(area, cache_dc);
-            } else {
-                inactive_cacher.insert(area, cache_dc);
-            }
-        }
+        if(calc_we_area(hWnd, HT_ICON, &icon_rect) != -1)
+            DrawIcon(hdc_graphic, (icon_rect.left - rect.left), (icon_rect.top - rect.top),
+                    RECTW(icon_rect), RECTH(icon_rect), win_info->hIcon);
     }
+
 
     /** draw caption title */
     if(win_info->spCaption)
@@ -3153,7 +2965,7 @@ static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
 
         del_rect.top = border;
         del_rect.bottom = border + 
-                    GetWindowElementAttr (hWnd, WE_METRICS_CAPTION);
+            GetWindowElementAttr (hWnd, WE_METRICS_CAPTION);
 
         ExcludeClipRect (hdc_graphic, &del_rect);
         SetBkMode(hdc_graphic, BM_TRANSPARENT);
@@ -3186,17 +2998,14 @@ static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
         SelectFont(hdc_graphic, old_font);
         IncludeClipRect (hdc_graphic, &del_rect);
     }
-    
+
     MGPlusGraphicSave (graphic, hdc, 0, 0, 0, 0, rect.left, rect.top);
 
-    if (!is_used_cache)
-    {
-        if (path) {
-            MGPlusPathDelete (path);
-        }
-        if (brush) {
-            MGPlusBrushDelete (brush);
-        }
+    if (path) {
+        MGPlusPathDelete (path);
+    }
+    if (brush) {
+        MGPlusBrushDelete (brush);
     }
     MGPlusGraphicDelete (graphic);
 }
@@ -3690,8 +3499,6 @@ static int get_scroll_status (HWND hWnd, BOOL isVert)
 static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
 {
     FUNCTION_SCOPE_TIMING();
-    static CacheManager hthumb_cache;
-    static CacheManager vthumb_cache;
     BOOL    isCtrl = FALSE;    /** if TRUE it is scrollbar control else not */
     int     sb_status = 0;
     int     bn_status = 0;
@@ -3882,14 +3689,6 @@ static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
                             right_blank_w, RECTH(rect), rc_thumb.right - (RECTW(rc_rarrow) ? 0 : 1), rect.top);
                 }
 
-                CacheManager::Area thumb_area(RECTW(rc_thumb), RECTH(rc_thumb));
-                HDC dc_cached = hthumb_cache.find(thumb_area);
-                if (HDC_INVALID != dc_cached)
-                {
-                    BitBlt(dc_cached, 0, 0, thumb_area.w_, thumb_area.h_, 
-                            hdc, rc_thumb.left, rc_thumb.top, 0);
-                }
-                else
                 {
                     pixels[0] = mp_gradient_color (fgc_3d, LFRDR_3DBOX_COLOR_LIGHTER, 250);
                     pixels[1] = mp_gradient_color (fgc_dis, LFRDR_3DBOX_COLOR_LIGHTER, 70);
@@ -3931,17 +3730,8 @@ static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
                                 RECTW(rect2), RECTH(rect2));
                         MGPlusFillPath (thumb_graphic, brush, path); 
 
-                        HDC cache_dc = CreateCompatibleDCEx(hdc, thumb_area.w_, thumb_area.h_);
-                        if (HDC_INVALID == cache_dc)
-                        {
-                            MGPlusGraphicDelete (graphic);
-                            break;
-                        }
-                        MGPlusGraphicSave (thumb_graphic, cache_dc, 0, 0, 0, 0,
-                                0, 0);
-                        BitBlt(cache_dc, 0, 0, thumb_area.w_, thumb_area.h_,
-                                hdc, rc_thumb.left, rc_thumb.top, 0);
-                        hthumb_cache.insert(thumb_area, cache_dc);
+                        MGPlusGraphicSave (thumb_graphic, hdc, 0, 0, RECTW(rc_thumb), RECTH(rc_thumb),
+                                                                rc_thumb.left, rc_thumb.top);
 
                         MGPlusGraphicDelete (thumb_graphic);
                     }
@@ -4070,68 +3860,49 @@ static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
                             - (RECTH(rc_down_arrow) ? 0 : 1));
                 }
 
-                CacheManager::Area thumb_area(RECTW(rc_thumb), RECTH(rc_thumb));
-                HDC dc_cached = vthumb_cache.find(thumb_area);
-                if (HDC_INVALID != dc_cached)
+                pixels[0] = mp_gradient_color(fgc_3d, LFRDR_3DBOX_COLOR_LIGHTER, 250);
+                pixels[1] = mp_gradient_color(fgc_dis, LFRDR_3DBOX_COLOR_LIGHTER, 70);
+
+                pixels_other[0] = mp_gradient_color(fgc_dis, 
+                        LFRDR_3DBOX_COLOR_LIGHTER, 70);
+                pixels_other[1] = mp_gradient_color(fgc_dis, 
+                        LFRDR_3DBOX_COLOR_LIGHTER, 100);
+
+                HGRAPHICS thumb_graphic = MGPlusGraphicCreate (RECTW (rc_thumb), RECTH (rc_thumb));
+                if (thumb_graphic)
                 {
-                    BitBlt(dc_cached, 0, 0, thumb_area.w_, thumb_area.h_, 
-                            hdc, rc_thumb.left, rc_thumb.top, 0);
-                }
-                else
-                {
-                    pixels[0] = mp_gradient_color(fgc_3d, LFRDR_3DBOX_COLOR_LIGHTER, 250);
-                    pixels[1] = mp_gradient_color(fgc_dis, LFRDR_3DBOX_COLOR_LIGHTER, 70);
+                    BitBlt (hdc, rc_thumb.left, rc_thumb.top, RECTW (rc_thumb), RECTH (rc_thumb),
+                            MGPlusGetGraphicDC (thumb_graphic), 0, 0, 0);
+                    rect1.top = 1;
+                    rect1.left = 1;
+                    rect1.right = rect1.left + RECTW(rc_thumb)/3;
+                    rect1.bottom = RECTH (rc_thumb);
 
-                    pixels_other[0] = mp_gradient_color(fgc_dis, 
-                            LFRDR_3DBOX_COLOR_LIGHTER, 70);
-                    pixels_other[1] = mp_gradient_color(fgc_dis, 
-                            LFRDR_3DBOX_COLOR_LIGHTER, 100);
+                    rect2.top = rect1.top;
+                    rect2.left = rect1.right;
+                    rect2.right = RECTW(rc_thumb) - 1;
+                    rect2.bottom = rect1.bottom;
 
-                    HGRAPHICS thumb_graphic = MGPlusGraphicCreate (RECTW (rc_thumb), RECTH (rc_thumb));
-                    if (thumb_graphic)
-                    {
-                        BitBlt (hdc, rc_thumb.left, rc_thumb.top, RECTW (rc_thumb), RECTH (rc_thumb),
-                                MGPlusGetGraphicDC (thumb_graphic), 0, 0, 0);
-                        rect1.top = 1;
-                        rect1.left = 1;
-                        rect1.right = rect1.left + RECTW(rc_thumb)/3;
-                        rect1.bottom = RECTH (rc_thumb);
+                    MGPlusSetLinearGradientBrushRect (brush, &rect1);
+                    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
 
-                        rect2.top = rect1.top;
-                        rect2.left = rect1.right;
-                        rect2.right = RECTW(rc_thumb) - 1;
-                        rect2.bottom = rect1.bottom;
+                    MGPlusPathReset (path);
+                    MGPlusPathAddRectangleI (path, rect1.left, rect1.top, 
+                            RECTW(rect1), RECTH(rect1));
+                    MGPlusFillPath (thumb_graphic, brush, path); 
 
-                        MGPlusSetLinearGradientBrushRect (brush, &rect1);
-                        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
+                    MGPlusSetLinearGradientBrushRect(brush, &rect2);
+                    MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels_other, 2); 
 
-                        MGPlusPathReset (path);
-                        MGPlusPathAddRectangleI (path, rect1.left, rect1.top, 
-                                RECTW(rect1), RECTH(rect1));
-                        MGPlusFillPath (thumb_graphic, brush, path); 
+                    MGPlusPathReset (path);
+                    MGPlusPathAddRectangleI(path, rect2.left, rect2.top,
+                            RECTW(rect2), RECTH(rect2));
 
-                        MGPlusSetLinearGradientBrushRect(brush, &rect2);
-                        MGPlusSetLinearGradientBrushColors(brush, (ARGB*)pixels_other, 2); 
+                    MGPlusFillPath (thumb_graphic, brush, path); 
+                    MGPlusGraphicSave (thumb_graphic, hdc, 0, 0, RECTW(rc_thumb), RECTH(rc_thumb),
+                                                            rc_thumb.left, rc_thumb.top);
 
-                        MGPlusPathReset (path);
-                        MGPlusPathAddRectangleI(path, rect2.left, rect2.top,
-                                RECTW(rect2), RECTH(rect2));
-
-                        MGPlusFillPath (thumb_graphic, brush, path); 
-                        HDC cache_dc = CreateCompatibleDCEx(hdc, thumb_area.w_, thumb_area.h_);
-                        if (HDC_INVALID == cache_dc)
-                        {
-                            MGPlusGraphicDelete (graphic);
-                            break;
-                        }
-                        MGPlusGraphicSave (thumb_graphic, cache_dc, 0, 0, 0, 0,
-                                0, 0);
-                        BitBlt(cache_dc, 0, 0, thumb_area.w_, thumb_area.h_,
-                                hdc, rc_thumb.left, rc_thumb.top, 0);
-                        vthumb_cache.insert(thumb_area, cache_dc);
-
-                        MGPlusGraphicDelete (thumb_graphic);
-                    }
+                    MGPlusGraphicDelete (thumb_graphic);
                 }
                 SetPenColor (hdc, DWORD2PIXEL (hdc, 
                             gradient_color (fgc_dis,
@@ -4141,8 +3912,8 @@ static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
                 LineTo (hdc, rc_thumb.right - 1, rc_thumb.bottom);
                 LineTo (hdc, rc_thumb.left, rc_thumb.bottom);
                 LineTo (hdc, rc_thumb.left, rc_thumb.top);
-//                MoveTo (hdc, rc_thumb.left + 1, rc_thumb.bottom);
-//                LineTo (hdc, rc_thumb.right - 2, rc_thumb.bottom);
+                //                MoveTo (hdc, rc_thumb.left + 1, rc_thumb.bottom);
+                //                LineTo (hdc, rc_thumb.right - 2, rc_thumb.bottom);
             }
             MGPlusGraphicDelete (graphic);
         }
@@ -4297,8 +4068,6 @@ static void
 draw_trackbar (HWND hWnd, HDC hdc, LFRDR_TRACKBARINFO *info)
 {
     FUNCTION_SCOPE_TIMING();
-    static CacheManager s_Htrackbar_cache;
-    static CacheManager s_Vtrackbar_cache;
     RECT    rc_client, rc_border, rc_ruler, rc_bar, rect;
     int     x = 0, y = 0, w = 0, h = 0;
     int     max, min;
@@ -4339,153 +4108,136 @@ draw_trackbar (HWND hWnd, HDC hdc, LFRDR_TRACKBARINFO *info)
     w = RECTW (rc_border);
     h = RECTH (rc_border);
 
-    CacheManager* cacher = (dwStyle & TBS_VERTICAL) ? &s_Vtrackbar_cache : &s_Htrackbar_cache;
-    CacheManager::Area bar_area(RECTW (rc_client), RECTH (rc_client));
-    RECT rc_draw = {0, 0, bar_area.w_ - 1, bar_area.h_ -1};
-    HDC hdc_cached = cacher->find(bar_area);
-    if (HDC_INVALID != hdc_cached)
-    {
-        BitBlt(hdc_cached, 0, 0, -1, -1, hdc_graphic, rc_client.left, rc_client.top, 0);
+    RECT rc_draw = {0, 0, RECTW (rc_client) - 1, RECTH (rc_client) - 1};
+    BitBlt (hdc, rc_client.left, rc_client.top, RECTW (rc_client), RECTH (rc_client),
+            hdc_graphic, 0, 0, 0);
+
+    brush = MGPlusBrushCreate (MP_BRUSH_TYPE_LINEARGRADIENT); 
+    if (!brush){
+        MGPlusGraphicDelete (graphic);
+        return;
     }
-    else
-    {
-        BitBlt (hdc, rc_client.left, rc_client.top, RECTW (rc_client), RECTH (rc_client),
-                hdc_graphic, 0, 0, 0);
 
-        brush = MGPlusBrushCreate (MP_BRUSH_TYPE_LINEARGRADIENT); 
-        if (!brush){
-            MGPlusGraphicDelete (graphic);
-            return;
-        }
+    path = MGPlusPathCreate (MP_PATH_FILL_MODE_WINDING);
+    if (!path) {
+        MGPlusGraphicDelete (graphic);
+        MGPlusBrushDelete (brush);
+        return;
+    }
 
-        path = MGPlusPathCreate (MP_PATH_FILL_MODE_WINDING);
-        if (!path) {
-            MGPlusGraphicDelete (graphic);
-            MGPlusBrushDelete (brush);
-            return;
-        }
+    rc_ruler.left -= rc_client.left;
+    rc_ruler.top -= rc_client.top;
+    rc_ruler.right -= rc_client.left;
+    rc_ruler.bottom -= rc_client.top;
 
-        rc_ruler.left -= rc_client.left;
-        rc_ruler.top -= rc_client.top;
-        rc_ruler.right -= rc_client.left;
-        rc_ruler.bottom -= rc_client.top;
+    /* get data of trackbar. */
+    TickFreq = info->nTickFreq;
 
-        /* get data of trackbar. */
-        TickFreq = info->nTickFreq;
+    /* draw the border according to trackbar style with renderer. */
+    //        rc_draw.left   = 0;
+    //        rc_draw.top    = 0;
+    //        rc_draw.right  = RECTW (rc_client) - 1;
+    //        rc_draw.bottom = RECTH (rc_client)  - 1;
+    draw_3dbox (hdc_graphic, &rc_draw, bgc, LFRDR_BTN_STATUS_PRESSED);
 
-        /* draw the border according to trackbar style with renderer. */
-//        rc_draw.left   = 0;
-//        rc_draw.top    = 0;
-//        rc_draw.right  = RECTW (rc_client) - 1;
-//        rc_draw.bottom = RECTH (rc_client)  - 1;
-        draw_3dbox (hdc_graphic, &rc_draw, bgc, LFRDR_BTN_STATUS_PRESSED);
+    rect = rc_draw;
+    ++rect.left;
+    ++rect.top;
+    --rect.right;
+    --rect.bottom;
 
-        rect = rc_draw;
-        ++rect.left;
-        ++rect.top;
-        --rect.right;
-        --rect.bottom;
+    pixels [0] = mp_gradient_color (bgc, LFRDR_3DBOX_COLOR_DARKER, 60);
+    pixels [1]  = mp_gradient_color (bgc, LFRDR_3DBOX_COLOR_LIGHTER, 90);
 
-        pixels [0] = mp_gradient_color (bgc, LFRDR_3DBOX_COLOR_DARKER, 60);
-        pixels [1]  = mp_gradient_color (bgc, LFRDR_3DBOX_COLOR_LIGHTER, 90);
+    MPLinearGradientMode mode;
+    if (!(dwStyle & TBS_VERTICAL)) {
+        mode = MP_LINEAR_GRADIENT_MODE_VERTICAL;
+    }
+    else {
+        mode = MP_LINEAR_GRADIENT_MODE_HORIZONTAL;
+    }
 
-        MPLinearGradientMode mode;
-        if (!(dwStyle & TBS_VERTICAL)) {
-            mode = MP_LINEAR_GRADIENT_MODE_VERTICAL;
-        }
-        else {
-            mode = MP_LINEAR_GRADIENT_MODE_HORIZONTAL;
-        }
+    MGPlusSetLinearGradientBrushMode (brush, mode);
+    MGPlusSetLinearGradientBrushRect (brush, &rc_draw);
+    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
 
-        MGPlusSetLinearGradientBrushMode (brush, mode);
-        MGPlusSetLinearGradientBrushRect (brush, &rc_draw);
-        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
+    MGPlusPathAddRectangleI (path, rc_draw.left, rc_draw.top, RECTW(rc_draw), RECTH(rc_draw));
+    MGPlusFillPath (graphic, brush, path); 
 
-        MGPlusPathAddRectangleI (path, rc_draw.left, rc_draw.top, RECTW(rc_draw), RECTH(rc_draw));
-        MGPlusFillPath (graphic, brush, path); 
+    /* draw the rulder in middle of trackbar with renderer . */
+    rc_draw.left   = rc_ruler.left;
+    rc_draw.top    = rc_ruler.top;
+    rc_draw.right  = rc_ruler.right - 1;
+    rc_draw.bottom = rc_ruler.bottom - 1;
+    draw_3dbox (hdc_graphic, &rc_draw, bgc, LFRDR_BTN_STATUS_PRESSED);
 
-        /* draw the rulder in middle of trackbar with renderer . */
-        rc_draw.left   = rc_ruler.left;
-        rc_draw.top    = rc_ruler.top;
-        rc_draw.right  = rc_ruler.right - 1;
-        rc_draw.bottom = rc_ruler.bottom - 1;
-        draw_3dbox (hdc_graphic, &rc_draw, bgc, LFRDR_BTN_STATUS_PRESSED);
+    rect = rc_draw;
+    ++rect.left;
+    ++rect.top;
+    --rect.right;
+    --rect.bottom;
 
-        rect = rc_draw;
-        ++rect.left;
-        ++rect.top;
-        --rect.right;
-        --rect.bottom;
+    pixels[0] = mp_gradient_color(bgc, LFRDR_3DBOX_COLOR_DARKER, 40);
+    pixels[1] = mp_gradient_color(bgc, LFRDR_3DBOX_COLOR_LIGHTER, 100);
 
-        pixels[0] = mp_gradient_color(bgc, LFRDR_3DBOX_COLOR_DARKER, 40);
-        pixels[1] = mp_gradient_color(bgc, LFRDR_3DBOX_COLOR_LIGHTER, 100);
+    if (!(dwStyle & TBS_VERTICAL)) {
+        mode = MP_LINEAR_GRADIENT_MODE_VERTICAL;
+    }
+    else {
+        mode = MP_LINEAR_GRADIENT_MODE_HORIZONTAL;
+    }
+    MGPlusPathReset (path);
+    MGPlusSetLinearGradientBrushMode (brush, mode);
+    MGPlusSetLinearGradientBrushRect (brush, &rc_draw);
+    MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
 
-        if (!(dwStyle & TBS_VERTICAL)) {
-            mode = MP_LINEAR_GRADIENT_MODE_VERTICAL;
-        }
-        else {
-            mode = MP_LINEAR_GRADIENT_MODE_HORIZONTAL;
-        }
-        MGPlusPathReset (path);
-        MGPlusSetLinearGradientBrushMode (brush, mode);
-        MGPlusSetLinearGradientBrushRect (brush, &rc_draw);
-        MGPlusSetLinearGradientBrushColors (brush, (ARGB*)pixels, 2); 
+    MGPlusPathAddRectangleI(path, rc_draw.left, rc_draw.top, 
+            RECTW(rc_draw), RECTH(rc_draw));
+    MGPlusFillPath (graphic, brush, path); 
 
-        MGPlusPathAddRectangleI(path, rc_draw.left, rc_draw.top, 
-                RECTW(rc_draw), RECTH(rc_draw));
-        MGPlusFillPath (graphic, brush, path); 
+    max = info->nMax;
+    min = info->nMin;
+    sliderw = RECTW(rc_bar);
+    sliderh = RECTH(rc_bar);
 
-        max = info->nMax;
-        min = info->nMin;
-        sliderw = RECTW(rc_bar);
-        sliderh = RECTH(rc_bar);
+    /* draw the tick of trackbar. */
+    if (!(dwStyle & TBS_NOTICK)) {
+        SetPenColor(hdc_graphic, 
+                GetWindowElementPixel(hWnd, WE_FGC_THREED_BODY));
+        if (dwStyle & TBS_VERTICAL) {
+            TickStart = y + (HEIGHT_VERT_SLIDER >> 1); 
+            TickGap = itofix(h - HEIGHT_VERT_SLIDER);
+            TickGap = fixmul(TickGap, fixdiv( itofix(TickFreq), itofix (max - min)));
+            TickEnd = y + h - (HEIGHT_VERT_SLIDER >> 1);
 
-        /* draw the tick of trackbar. */
-        if (!(dwStyle & TBS_NOTICK)) {
-            SetPenColor(hdc_graphic, 
-                    GetWindowElementPixel(hWnd, WE_FGC_THREED_BODY));
-            if (dwStyle & TBS_VERTICAL) {
-                TickStart = y + (HEIGHT_VERT_SLIDER >> 1); 
-                TickGap = itofix(h - HEIGHT_VERT_SLIDER);
-                TickGap = fixmul(TickGap, fixdiv( itofix(TickFreq), itofix (max - min)));
-                TickEnd = y + h - (HEIGHT_VERT_SLIDER >> 1);
+            for (Tick = itofix (TickStart); (int)(fixtof(Tick)) <= TickEnd; Tick = fixadd (Tick, TickGap) ) {
+                MoveTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER, (int)(fixtof (Tick)));
+                LineTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER + LEN_TICK, (int)(fixtof (Tick)));
+            }
+            if ((int) (fixtof (fixadd (fixsub (Tick, TickGap), ftofix (0.9)))) < TickEnd) {
+                MoveTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER, TickEnd);
+                LineTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER + LEN_TICK, TickEnd);
+            }
+        } else {
+            TickStart = x + (WIDTH_HORZ_SLIDER >> 1); 
+            TickGap = fixmul (itofix (w - WIDTH_HORZ_SLIDER), fixdiv (itofix (TickFreq), itofix (max - min)));
+            TickEnd = x + w - (WIDTH_HORZ_SLIDER >> 1);
 
-                for (Tick = itofix (TickStart); (int)(fixtof(Tick)) <= TickEnd; Tick = fixadd (Tick, TickGap) ) {
-                    MoveTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER, (int)(fixtof (Tick)));
-                    LineTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER + LEN_TICK, (int)(fixtof (Tick)));
-                }
-                if ((int) (fixtof (fixadd (fixsub (Tick, TickGap), ftofix (0.9)))) < TickEnd) {
-                    MoveTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER, TickEnd);
-                    LineTo (hdc_graphic, x + (w>>1) + (sliderw>>1) + GAP_TICK_SLIDER + LEN_TICK, TickEnd);
-                }
-            } else {
-                TickStart = x + (WIDTH_HORZ_SLIDER >> 1); 
-                TickGap = fixmul (itofix (w - WIDTH_HORZ_SLIDER), fixdiv (itofix (TickFreq), itofix (max - min)));
-                TickEnd = x + w - (WIDTH_HORZ_SLIDER >> 1);
+            for (Tick = itofix (TickStart); (int)(fixtof(Tick)) <= TickEnd; Tick = fixadd (Tick, TickGap) ) {
+                MoveTo (hdc_graphic, (int)(fixtof (Tick)), y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER);
+                LineTo (hdc_graphic, (int)(fixtof (Tick)), y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER + LEN_TICK);
+            }
 
-                for (Tick = itofix (TickStart); (int)(fixtof(Tick)) <= TickEnd; Tick = fixadd (Tick, TickGap) ) {
-                    MoveTo (hdc_graphic, (int)(fixtof (Tick)), y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER);
-                    LineTo (hdc_graphic, (int)(fixtof (Tick)), y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER + LEN_TICK);
-                }
-
-                if ((int) (fixtof (fixadd (fixsub (Tick, TickGap), ftofix (0.9)))) < TickEnd)
-                {
-                    MoveTo (hdc_graphic, TickEnd, y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER);
-                    LineTo (hdc_graphic, TickEnd, y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER + LEN_TICK);
-                }
+            if ((int) (fixtof (fixadd (fixsub (Tick, TickGap), ftofix (0.9)))) < TickEnd)
+            {
+                MoveTo (hdc_graphic, TickEnd, y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER);
+                LineTo (hdc_graphic, TickEnd, y + (h>>1) + (sliderh>>1) + GAP_TICK_SLIDER + LEN_TICK);
             }
         }
-        HDC cache_dc = CreateCompatibleDCEx(hdc, bar_area.w_, bar_area.h_);
-        if (HDC_INVALID != cache_dc)
-        {
-            MGPlusGraphicSave (graphic, cache_dc, 0, 0, -1, -1, 0, 0);
-//            BitBlt(cache_dc, 0, 0, -1, -1, hdc, rc_client.left, rc_client.top, 0);
-            cacher->insert(bar_area, cache_dc);
-        }
-
-        MGPlusPathDelete (path);
-        MGPlusBrushDelete (brush);
     }
+
+    MGPlusPathDelete (path);
+    MGPlusBrushDelete (brush);
 
     draw_trackbar_thumb (hWnd, hdc_graphic, &rc_bar, dwStyle);
     /* draw the focus frame with renderer. */
@@ -4895,6 +4647,11 @@ WINDOW_ELEMENT_RENDERER wnd_rdr_fashion = {
 BOOL MGPlusRegisterFashionLFRDR (void)
 {
     return AddWindowElementRenderer ("fashion", &wnd_rdr_fashion);
+}
+
+BOOL MGPlusUnregisterFashionLFRDR (void)
+{
+    return RemoveWindowElementRenderer("fashion");
 }
 
 #endif /* _MGPLUS_LFRDR_FASHION */

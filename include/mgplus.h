@@ -11,7 +11,7 @@
  */
 
 
-/*! \mainpage mGPlus V1.2.1 API Reference
+/*! \mainpage mGPlus V1.2.4 API Reference
  *
  * \section mainpage Introduction
  *
@@ -25,8 +25,6 @@
 
 #ifndef _MGPLUS_H
 #define _MGPLUS_H
-
-#define __attribute__(n)
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,10 +58,10 @@ extern "C" {
   #define MGPLUS_EXPORT
 #endif
 
-    /**
-     * \defgroup macros_types Macros and Data Types
-     * @{
-     */
+/**
+ * \defgroup macros_types Macros and Data Types
+ * @{
+ */
 
 #define MP_INV_HANDLE   0
 
@@ -2720,6 +2718,19 @@ MGPLUS_EXPORT MPStatus MGPlusBrushDelete (HBRUSH brush);
 MGPLUS_EXPORT MPStatus MGPlusSetSolidBrushColor (HBRUSH brush, ARGB rgba);
 
 /**
+ * \fn MPStatus MGPlusGetSolidBrushColor (HBRUSH brush, ARGB* rgba)
+ * \brief Set color with solid brush.
+ *
+ * This function sets color with solid brush. 
+ * 
+ * \param brush           The bursh pointer.
+ * \param rgba            The color pointer. 
+ *
+ * \return Get Status, MP_GENERIC_ERROR indicates an error.
+ */
+MPStatus MGPlusGetSolidBrushColor (HBRUSH brush, ARGB* rgba);
+
+/**
  * \fn MPStatus MGPlusSetTextureBrushImage (HBRUSH brush, 
  * BITMAP* bitmap)
  *
@@ -2888,8 +2899,40 @@ MGPLUS_EXPORT MPStatus MGPlusSetLinearGradientBrushColors (HBRUSH brush,
  *
  * \return Get Status, MP_GENERIC_ERROR indicates an error.
  */
-MPStatus MGPlusSetLinearGradientBrushColorsEx (HBRUSH brush, 
+MGPLUS_EXPORT MPStatus MGPlusSetLinearGradientBrushColorsEx (HBRUSH brush, 
         ARGB* colors, int count, float* position);
+
+
+/**
+ * \fn MGPlusLinearGradientBrushGetColors (HBRUSH brush, ARGB* color, float* position))
+ *
+ * \brief get the linear gradient brush color.
+ *
+ * This function get the linear gradient brush color,
+ * supported by mGPlus V1.2.1 or upper. 
+ * 
+ * \param brush           The bursh pointer.
+ * \param color           The input linear graidnet brush's color array pointer.
+ * \param position           The input linear graidnet brush's position array pointer.
+ *
+ * \return Get Status, MP_GENERIC_ERROR indicates an error.
+ */
+MGPLUS_EXPORT MPStatus MGPlusLinearGradientBrushGetColors (HBRUSH brush, ARGB* color, 
+        float* position);
+
+/**
+ * \fn MGPlusLinearGradientBrushGetColorNumber (HBRUSH brush)
+ *
+ * \brief get the linear gradient brush color number.
+ *
+ * This function get the linear gradient brush color number,
+ * supported by mGPlus V1.2.1 or upper. 
+ * 
+ * \param brush           The bursh pointer.
+ *
+ * \return Get Gradient color number. 
+ */
+MGPLUS_EXPORT int MGPlusLinearGradientBrushGetColorNumber (HBRUSH brush);
 
 /**
  * \fn MGPlusLinearGradientBrushAddColor (HBRUSH brush, ARGB color, float position);
@@ -2900,7 +2943,7 @@ MPStatus MGPlusSetLinearGradientBrushColorsEx (HBRUSH brush,
  * supported by mGPlus V1.2.1 or upper. 
  * 
  * \param brush           The bursh pointer.
- * \param color           The linear graidnet brush's color pointer.
+ * \param color           The linear graidnet brush's color.
  * \param position        The linear gradient brush's color position info.
  *
  * \return Get Status, MP_GENERIC_ERROR indicates an error.
@@ -3021,6 +3064,15 @@ MGPLUS_EXPORT MPStatus MGPlusDrawGlyph (HGRAPHICS graphics, HFONT hfont,
  * \return if success return TRUE, else return FALSE.
  */ 
 MGPLUS_EXPORT BOOL MGPlusRegisterFashionLFRDR (void);
+
+/**
+ * \fn MGPLUS_EXPORT BOOL MGPlusUnregisterFashionLFRDR (void);
+ *
+ * \brief  Unregisters the Fashion LFRDR.
+ *
+ * \return if success return TRUE, else return FALSE.
+ */ 
+MGPLUS_EXPORT BOOL MGPlusUnregisterFashionLFRDR (void);
 
 
     /** @} end of fashionLF */

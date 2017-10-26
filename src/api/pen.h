@@ -13,8 +13,11 @@
 
 #include "mgplus.h"
 
-typedef struct _MPPen
-{
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct _MPPen {
     /*draw color.*/
     ARGB           rgba;  
     /* the pen's width.*/
@@ -25,7 +28,11 @@ typedef struct _MPPen
     int            num_dashes;
     int            dash_phase;
     double         miter_limit;
-}MPPen;
+} MPPen;
+
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

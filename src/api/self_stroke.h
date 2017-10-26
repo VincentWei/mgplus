@@ -16,4 +16,5 @@ template<class Source> struct self_stroke_draft
     void rewind(unsigned path_id) { s.rewind(path_id); }
     unsigned vertex(double* x, double* y) { return s.vertex(x, y); }
 };
+
 #endif

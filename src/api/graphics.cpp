@@ -10,6 +10,9 @@
  **
  ** Create date: 2008/12/02
  */
+#include <string.h>
+#include <math.h>
+#include <assert.h>
 
 #ifdef _MGGAL_NEXUS
 #   define CFG_HARDWARE_SURFACE
@@ -42,6 +45,7 @@
 #endif
 #include <math.h>
 #include <assert.h>
+
 
 #define DRAW_GRAPHIC(hdc, rgn, pctx, cb) do {\
         if (LockDCEx (hdc, rgn, pctx, cb)) UnlockDC(hdc); \
@@ -174,6 +178,8 @@ MGPlusGraphicCreateWithoutCanvas(HDC hdc)
     int width, height;
     int swidth, sheight;
     int pitch = 0;
+    MPGraphics *pg;
+    agg_draw_op *op;
 
     if (hdc == HDC_INVALID)
         return (HGRAPHICS)MP_INV_HANDLE;
@@ -184,11 +190,12 @@ MGPlusGraphicCreateWithoutCanvas(HDC hdc)
     if (width <= 0 || height <= 0)
         return (HGRAPHICS)MP_INV_HANDLE;
 
-    agg_draw_op* op = get_pixfmt_op(hdc);
+    op = get_pixfmt_op(hdc);
     if (!op)
         return MP_INV_HANDLE;
 
-    MPGraphics* pg = new MPGraphics();
+    pg = new MPGraphics;
+
     if (!pg)
         return MP_INV_HANDLE;
 
@@ -302,7 +309,7 @@ MGPlusGraphicCreate (int width, int height)
     if (width <= 0 || height <= 0)
         return MP_INV_HANDLE;
 
-    MPGraphics * pgraphic = new MPGraphics();
+    MPGraphics *pgraphic = new MPGraphics;
     if (!pgraphic)
         return MP_INV_HANDLE;
 
@@ -510,7 +517,9 @@ MGPlusGraphicSave (HGRAPHICS graphics, HDC hdc,
             ctx.pg = pg;
 
             DRAW_GRAPHIC(hdc, cliprgn_dst, &ctx, direct_graphic_save);
+
             DestroyClipRgn (cliprgn_dst);
+
             return MP_OK;
         }
         DestroyClipRgn (cliprgn_dst);
@@ -628,7 +637,7 @@ MGPlusGraphicDelete (HGRAPHICS graphics)
 
     while (i < MAX_BMP_NUM) {
         if (pg->surf_img [i]) {
-            free(pg->surf_img[i]);
+            delete pg->surf_img[i];
         }
         i ++;
     }
@@ -639,7 +648,11 @@ MGPlusGraphicDelete (HGRAPHICS graphics)
         MGPlusPathDelete((HPATH)pg->clip_ras.path);
     }
 
+#if 1
     delete pg;
+#else
+    free(pg);
+#endif
     return MP_OK;
 }
 
@@ -1416,27 +1429,28 @@ MGPlusFillPath (HGRAPHICS graphics, HBRUSH brush, HPATH path)
     MPGraphics *pg = (MPGraphics *)graphics;
     MPBrush* m_brush = (MPBrush*) brush;
     MPPath* m_path = (MPPath *) path;
+    RECT rc;
+    PCLIPRGN region;
 
     if (!pg || !m_brush || !m_path) 
         return MP_GENERIC_ERROR;
-
-    RECT rc;
 
     SetRect(&rc, 0, 0, 
            GET_GDCAP_MAXX(pg->hdc), 
            GET_GDCAP_MAXY(pg->hdc));
 
-    PCLIPRGN region = CreateClipRgn ();
+    region = CreateClipRgn ();
     SetClipRgn (region, &rc);
 
     ctx.gps = pg;
     ctx.brush = m_brush;
     ctx.path = m_path;
     ctx.mot.multiply(pg->matrix_gfx);
-    
+
     DRAW_GRAPHIC(pg->hdc, region, &ctx, pg->op->fill_path);
 
     DestroyClipRgn(region);
+
     return MP_OK;
 }
 
@@ -1449,7 +1463,7 @@ MGPlusGraphicLoadBitmap (HGRAPHICS graphics, int n_index, PBITMAP p_bitmap)
         return MP_INDEX_NOT_MATCH;
 
     if (pgs->surf_img [n_index] == NULL)
-        pgs->surf_img [n_index] = (PBITMAP)calloc(1, sizeof(BITMAP));
+        pgs->surf_img [n_index] =  new BITMAP;
 
     memcpy(pgs->surf_img [n_index], p_bitmap, sizeof(BITMAP));
     pgs->rendering_img [n_index].attach (pgs->surf_img[n_index]->bmBits,
@@ -1499,7 +1513,7 @@ MGPlusGraphicLoadBitmapFromFile(HGRAPHICS graphics, int n_index, char* file)
     if (n_index > MAX_BMP_NUM || n_index < 0)
         return MP_INDEX_NOT_MATCH;
     if (pgs->surf_img [n_index] == NULL)
-        pgs->surf_img [n_index] = (PBITMAP) calloc (1, sizeof(BITMAP));
+        pgs->surf_img [n_index] = new BITMAP;
 
     if (pgs->hdc_flags == MP_HDC_EXTERNAL)
         hdc = pgs->img_dc;
@@ -1507,7 +1521,7 @@ MGPlusGraphicLoadBitmapFromFile(HGRAPHICS graphics, int n_index, char* file)
         hdc = pgs->hdc;
 
     if (LoadBitmapFromFile (hdc, pgs->surf_img[n_index], file)) {
-        free(pgs->surf_img[n_index]);
+        delete (pgs->surf_img[n_index]);
         pgs->surf_img[n_index] = NULL;
         return MP_GENERIC_ERROR;
     }
@@ -1636,7 +1650,7 @@ int MGPlusSaveHG (HGRAPHICS hg)
     DCSTATE* hg_state;
     MPGraphics* pg = (MPGraphics *)hg; 
 
-    hg_state = (DCSTATE*)calloc (1, sizeof (DCSTATE));
+    hg_state = new DCSTATE;
     if (hg_state == NULL)
         return 0;
 
@@ -1672,7 +1686,7 @@ int MGPlusSaveHG (HGRAPHICS hg)
 
 static void destroy_hg_state (DCSTATE* hg_state)
 {
-    free (hg_state);
+    delete  (hg_state);
 }
 
 BOOL MGPlusRestoreHG (HGRAPHICS hg, int saved_hg)

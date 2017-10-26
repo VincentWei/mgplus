@@ -32,14 +32,13 @@ extern "C" {
 
 #define MAX_PATHID 128
 
-typedef struct _MPPath
-{
+typedef struct _MPPath {
     MPFillMode          m_fill_mode;            // fill mode
     agg::path_storage   m_agg_ps;               // AGG store path
     unsigned            path_id [MAX_PATHID];
     int                 id;
     agg::trans_affine   matrix;
-}MPPath;
+} MPPath;
 
 #ifdef _MGPLUS_FONT_FT2
 typedef agg::font_engine_freetype_int32 font_engine_type;
@@ -50,7 +49,7 @@ typedef struct _MPFont
     font_engine_type*  m_feng;
     font_manager_type* m_fman;
     char*              fontname;
-}MPFont;
+} MPFont;
 #endif
 
 BOOL is_path_closed (MPPath* path);

@@ -12,7 +12,6 @@
  */
 
 #include "path.h"
-#include <malloc.h>
 
 #define SAFE_CHECK_PARAMETER(pointer)  \
     if(!pointer) return MP_INVALID_PARAMETER;
@@ -134,8 +133,9 @@ MGPlusPathTransform (HPATH path)
 
 HPATH MGPlusPathCreate (MPFillMode brushMode)
 {
-    MPPath* m_path = 0;
-    m_path = new MPPath(); 
+    MPPath* m_path = NULL;
+
+    m_path = new MPPath; 
 
     if (!m_path)
         return MP_INV_HANDLE;
@@ -144,15 +144,19 @@ HPATH MGPlusPathCreate (MPFillMode brushMode)
     m_path->m_agg_ps.remove_all ();               // AGG store path
     m_path->matrix.reset () ;
     m_path->id = 0;
+
     return (HPATH)m_path;
 }
 
 MPStatus MGPlusPathDelete (HPATH path)
 {
     MPPath* m_path = (MPPath*) path;
+
     if (!m_path)
         return MP_GENERIC_ERROR;
+
     delete (m_path);
+
     return MP_OK;
 }
 
@@ -218,7 +222,7 @@ MPStatus MGPlusPathGetPoints (HPATH path, int* count, MPPOINT** pt)
         return MP_GENERIC_ERROR;
 
     (*count) = m_path->m_agg_ps.total_vertices();
-    m_pt = *pt = (MPPOINT*) malloc(sizeof(MPPOINT) * (*count));
+    m_pt = *pt = new MPPOINT[*count];
 
     if (!m_pt)
         return MP_GENERIC_ERROR;
@@ -235,7 +239,6 @@ MPStatus MGPlusPathGetPoints (HPATH path, int* count, MPPOINT** pt)
 
 MPStatus MGPlusPathGetVertex (HPATH path, int idx, double* x, double* y, int* cmd)
 {
-    int i = 0;
     MPPath* m_path = (MPPath*) path;
 
     if (idx < 0 || !cmd
@@ -310,7 +313,6 @@ MPStatus MGPlusPathAddArc (HPATH path, float cx, float cy, float rx,
                  float ry, float start_angle, float sweep_angle)
 {
     MPPath* m_path = (MPPath*) path;
-    int count;
 
     if (!path || rx < 1 || ry < 1 || sweep_angle == 0)
         return MP_GENERIC_ERROR;
@@ -767,8 +769,7 @@ MPStatus MGPlusPathAddCurve (HPATH path, const MPPOINT* points, int count)
     //poly.move_to (points [0].x, points [0].y);
     poly.move_to (d_x, d_y);
 
-    for (i = 1; i < count; i++)
-    {
+    for (i = 1; i < count; i++) {
         d_x = (double) points [i].x;
         d_y = (double) points [i].y;
 
@@ -818,6 +819,9 @@ MPStatus MGPlusPathAddRoundRectEx (HPATH path, int x, int y,
     if (!m_path || rx < 1 || rx < 1)
         return MP_GENERIC_ERROR;
 
+    if (rx >= width/2) rx = width/2;
+    if (ry >= height/2) ry = height/2;
+
     agg::rounded_rect round_rect;
     round_rect.rect (x, y, x + width, y + height);
     round_rect.radius ((double)rx, (double)ry);
@@ -825,6 +829,7 @@ MPStatus MGPlusPathAddRoundRectEx (HPATH path, int x, int y,
     agg::path_storage path_roundrect;
     path_roundrect.concat_path (round_rect, 0);
     path_roundrect.transform (m_path->matrix);
+
 
     if (is_path_closed (m_path))
         m_path->m_agg_ps.concat_path (path_roundrect);
@@ -841,7 +846,7 @@ HFONT MGPlusCreateFont (const char* font_name, unsigned face_index,
         BOOL flip_y) 
 {
     MPFont* m_font = NULL;
-    m_font = new MPFont(); 
+    m_font = new MPFont; 
 
     if (!m_font)
         return MP_GENERIC_ERROR;
@@ -872,7 +877,7 @@ HFONT MGPlusCreateFont (const char* font_name, unsigned face_index,
     m_font->m_feng->width (width);
     m_font->m_feng->flip_y (flip_y);
 
-    m_font->fontname = (char*) malloc((strlen(font_name) + 1) * sizeof(char));
+    m_font->fontname = new char[strlen(font_name) + 1];
     if (m_font->fontname)
         strcpy(m_font->fontname, (char*)font_name);
 
@@ -886,7 +891,7 @@ MPStatus MGPlusDeleteFont (HFONT hfont)
         return MP_GENERIC_ERROR;
 
     if (m_font->fontname)
-        free (m_font->fontname);
+        delete [] (m_font->fontname);
 
     delete (m_font->m_feng);
     delete (m_font->m_fman);

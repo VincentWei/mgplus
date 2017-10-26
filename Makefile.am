@@ -1,6 +1,4 @@
-AUTOMAKE_OPTIONS=foreign
-
-SUBDIRS = src include m4 
+SUBDIRS = src include m4 cmake
 
 COMM_HDRS = mgplusconfig.h
 
@@ -11,3 +9,6 @@ libmgplusconfigdir = $(includedir)/mgplus
 libmgplusconfig_HEADERS = $(COMM_HDRS)
 
 EXTRA_DIST = INSTALL README autogen.sh
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = mgplus.pc

@@ -1,7 +1,76 @@
 *******************************************************************************
-What's new in trunk:
+What's new in tunck
+2017/10/26. CLEANUP: merge from rel-3-0
+	*  svn merge -r 1207:1246 ^/branches/rel-3-0
+
+*******************************************************************************
+What's new in this branch (rel-3-0) (1.2.4, 2011-01-31)
+
+2011/03/25. CLEANUP #?: Fix compiling issues on VxWorks. (modified by PT, commited
+by wanzheng)
+	* build/rules-mips.vxworks
+	* files.ng
+	* makefile.ng
+	* source.ng
+	* src/api/graphics.cpp
+	* src/api/lf_fashion.cpp
+
+2011/01/18. ENHANCEMENT #8: Add makeifle.ng compile script. (humingming)
+	* A makefile.ng
+	* A get-files.sh
+	* A build/rules-pc.linux
+	* A build/rules.sample
+	* M CMakeLists.txt
+
+2011/01/07. BUGFIXING #?: Add MGPlusUnregisterFashionLFRDR(). (wanzheng)
+	* include/mgplus.h
+	* src/api/lf_fashion.cpp
 
 05/11. BUGFIXING#?: Add include pthread.h when not in _MGRM_THREADS.(houhh)
+
+*******************************************************************************
+What's new in this branch (rel-3-0) (1.2.2, 2010-11-04)
+
+11/29. BUGFIXING #5201: Remove "#define __attribute__(n)" in mgplus.h
+(wanzheng)
+	* include/mgplus.h
+
+11/27. ENHANCEMENT #7 Add rx/ry check in MGPlusPathAddRoundRectEx . (houhh)
+	* src/api/path.cpp
+
+11/23. CLEANUP #?: Create and install files for pkg-config. (wanzheng)
+	* A mgplus.pc.in
+	* M CMakeLists.txt
+	* M configure.in
+	* M Makefile.am
+	* M src/CMakeLists.txt
+
+11/22. CLEANUP #?: Modify autotool scripts to install cmake modules of mGPlus.
+(wanzheng)
+	* A cmake/Makefile.am
+	* M configure.in
+	* M Makefile.am
+
+11/10. ENHANCEMENT #6 Add MGPlusSetLinearGradientBrushColorsEx define to
+mgplus.h, then reset the gradient color before set new color info. (houhh)
+	* include/mgplus.h 
+	* src/api/brush.cpp
+
+11/10: BUGFIXING #5208: SetBkMode(Transparent) in draw_tab(). (wanzheng)
+	* src/api/lf_fashion.cpp
+
+09/25. ENHANCEMENT #5 Add comment for MGPlusPathArcto api. (houhh)
+	* include/mgplus.h 
+
+09/25. ENHANCEMENT #4 Add FindMGPLUS.cmake (ZhaolinHu)
+	* cmake
+	* cmake/FindMGPLUS.cmake
+	* CMakeLists.txt
+
+09/10. ENHANCEMENT #3 Adjust for win32 platform (humingming)
+
+05/11. BUGFIXING#?: Add include pthread.h when not in _MGRM_THREADS.(houhh)
+
 	* src/api/graphics.cpp
 	* src/api/lf_fashion.cpp
 	
