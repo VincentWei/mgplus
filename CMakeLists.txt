@@ -143,7 +143,6 @@ configure_file(
 
 ##################### add sub directories #######################
 add_subdirectory (src)
-# add_subdirectory (test)
 
 #################### files install ##########################
 install (FILES "${PROJECT_BINARY_DIR}/mgplusconfig.h"

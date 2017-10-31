@@ -29,16 +29,11 @@ mgcompositedemo_LDADD = -lmgplus @APP_LIBS@
 blinds_SOURCES = blinds.c
 blinds_LDADD = -lmgplus @APP_LIBS@
 
-LDADD =../animate/common_animates/.libs/libcommon_animates.a  \
-	   ../animate/.libs/libanimate.a -lmgplus $(INTLLIBS) @APP_LIBS@
+LDADD = ../animate/libanimate.la -lmgplus $(INTLLIBS) @APP_LIBS@
 
 cubicrotate_SOURCES = cubicrotate.c
-#cubicrotate_LDADD = -lmgplus -lanimate -lcommon_animates @APP_LIBS@
-#cubicrotate_LDADD = -lmgplus -L../animate -lanimate -L../animate/common_animates -lcommon_animates @APP_LIBS@
-#cubicrotate_LDADD =  -lmgplus @APP_LIBS@
 
 centersplit_SOURCES = centersplit.c
-#centersplit_LDADD = -lmgplus -L../animate -lanimate -L../animate/common_animates -lcommon_animates @APP_LIBS@
 
 SUBDIRS = res
 

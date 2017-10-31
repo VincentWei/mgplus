@@ -1,9 +1,9 @@
 TOP_DIR=../..
-INCLUDES = -I.. -I../../include
+AM_CPPFLAGS = -I.. -I../../include
 
 libanimateincludedir = $(includedir)
 
-lib_LTLIBRARIES = libcommon_animates.la
+noinst_LTLIBRARIES = libcommon_animates.la
 
 SRC_FILES = common_animates.c alpha_animate.c
 

@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-
-AC_PREREQ(2.52)
-AC_INIT([src/mgcompositedemo.c])
+AC_PREREQ(2.59)
+AC_INIT(mgplus-samples, 1.0.0)
+AC_CONFIG_SRCDIR([src/mgcompositedemo.c])
 
 AC_CANONICAL_SYSTEM
 
@@ -16,7 +16,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-AM_INIT_AUTOMAKE(mgplus_test, 1.0.0)
+AM_INIT_AUTOMAKE
 
 dnl ========================================================================
 dnl Put the name and version of the package here
@@ -62,13 +62,13 @@ AC_CHECK_DECLS(_MGRM_STANDALONE, standalone_version="yes", foo=bar, [#include <m
 
 if test "x$threads_version" = "xyes"; then
     CFLAGS="$CFLAGS -D_REENTRANT"
-    APP_LIBS="$APP_LIBS -lpthread -lminigui_ths -lstdc++"
+    APP_LIBS="$APP_LIBS -lpthread -lminigui_ths -lstdc++ -ldl"
 else
 if test "x$standalone_version" = "xyes"; then
     CFLAGS="$CFLAGS -D_REENTRANT"
-    APP_LIBS="$APP_LIBS -lminigui_sa -lstdc++"
+    APP_LIBS="$APP_LIBS -lminigui_sa -lstdc++ -ldl"
 else
-    APP_LIBS="$APP_LIBS -lminigui_procs -lstdc++"
+    APP_LIBS="$APP_LIBS -lminigui_procs -lstdc++ -ldl"
 fi  
 fi
 
@@ -100,8 +100,8 @@ pen/Makefile
 path/Makefile 
 brush/Makefile 
 colorcomposite/Makefile 
-tcldemo/Makefile 
-tcldemo/res/Makefile 
+dnl tcldemo/Makefile 
+dnl tcldemo/res/Makefile 
 glyphoutline/Makefile 
 worldtransform/Makefile 
 
