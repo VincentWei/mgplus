@@ -136,7 +136,6 @@ set (prefix ${CMAKE_INSTALL_PREFIX})
 set (exec_prefix "\${prefix}")
 set (libdir "\${exec_prefix}/lib")
 set (includedir "\${prefix}/include")
-set (mGPlus_VERSION ${MGPLUS_VERSION})
 configure_file(
     "${PROJECT_SOURCE_DIR}/mgplus.pc.in"
     "${PROJECT_BINARY_DIR}/${MGPLUS_NAME}.pc")

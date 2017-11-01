@@ -40,6 +40,8 @@ extern "C" {
 #      include "../mgplusconfig.h"
 #  else
 #    include "mgplusconfig.h"
+#    undef PACKAGE
+#    undef VERSION
 #    undef PACKAGE_BUGREPORT
 #    undef PACKAGE_NAME
 #    undef PACKAGE_STRING
