@@ -37,7 +37,11 @@ extern "C" {
 
 #ifndef MGPLUS_MAJOR_VERSION
 #  ifdef __MGPLUS_LIB__
+#    if defined(__CMAKE_PROJECT__) || defined(WIN32)
+#      include "mgplusconfig.h"
+#    else
 #      include "../mgplusconfig.h"
+#    endif
 #  else
 #    include "mgplusconfig.h"
 #    undef PACKAGE
@@ -1702,8 +1706,7 @@ MGPLUS_EXPORT MPStatus MGPlusGraphicLoadBitmapFromFile (HGRAPHICS graphics,
  *
  * \sa MGPlusGraphicLoadBitmap
  */
-MPStatus 
-MGPlusGraphicUnLoadBitmap (HGRAPHICS graphics, int n_index);
+MGPLUS_EXPORT MPStatus MGPlusGraphicUnLoadBitmap (HGRAPHICS graphics, int n_index);
 
 /**
  * \fn MPStatus MGPlusGraphicUnLoadBitmap (HGRAPHICS graphics, 
@@ -1720,8 +1723,7 @@ MGPlusGraphicUnLoadBitmap (HGRAPHICS graphics, int n_index);
  *
  * \sa MGPlusGraphicLoadBitmap
  */
-PBITMAP
-MGPlusGraphicGetBitmap (HGRAPHICS graphics, int n_index);
+MGPLUS_EXPORT PBITMAP MGPlusGraphicGetBitmap (HGRAPHICS graphics, int n_index);
 
 /**
  * \fn MPStatus MGPlusSetImageAlpha (HGRAPHICS graphics, int alpha) 
@@ -2115,13 +2117,23 @@ MGPLUS_EXPORT MPStatus MGPlusPathAddRoundRectEx (HPATH path, int x, int y,
  * \fn MPStatus MPStatus MGPlusPathArcto (HPATH path, double x1, 
  * double y1, double x2, double y2, double radius);
  *
- * \brief Add a arc to a path and two tangent line through 
- * subpath last vectors, (x1, y1), (x2, y2).
+ * \brief Add a arc to a path and two tangent line of arc.
  *
- * This function add a arc to a path and two tangent line through 
- * subpath last vectors, (x1, y1), (x2, y2),
+ * This function add a arc to a path and two tangent line of arc,
+ * first line through subpath last vectors to (x1, y1), second line 
+ * through one arc point to (x2, y2).
  * supported by mGPlus V1.2.1 or upper.
  * 
+ * ---------(last vector) ---- (x1,y1) ---- (point of tangent).
+ *
+ *                                      arc
+ *
+ *                                         |(point of tangent).
+ *                                         |
+ *                                         | 
+ *                                         (x2,y2)
+ *
+ *
  * \param path         The path pointer.
  * \param x1           The x coordinat of first point .
  * \param y1           The y coordinat of first point .

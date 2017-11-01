@@ -8,7 +8,7 @@
  **
  ** Create date: 2009/03/22
  */
-#include "mgplusconfig.h"
+#include "mgplus.h"
 
 #ifdef _MGPLUS_PIXFMT_RGB24
 
@@ -24,7 +24,6 @@
 #include "agg_span_gradient.h"
 #include "agg_gamma_ctrl.h"
 
-#include "mgplus.h"
 #include "pen.h"
 #include "path.h"
 #include "graphics.h"

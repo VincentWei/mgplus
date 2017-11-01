@@ -40,11 +40,11 @@
 #include "agg_span_gradient.h"
 #include "agg_platform_support.h"
 #include "agg_gamma_ctrl.h"
+#include <math.h>
+#include <assert.h>
 #ifndef _MGRM_THREADS
 #include <pthread.h>
 #endif
-#include <math.h>
-#include <assert.h>
 
 
 #define DRAW_GRAPHIC(hdc, rgn, pctx, cb) do {\
@@ -147,9 +147,9 @@ static agg_draw_op* get_pixfmt_op(HDC hdc)
 
     for(i = 0; i < TABLESIZE(pixfmt_op); i++) {
         if (pixfmt_op[i].rmask == rmask &&
-                pixfmt_op[i].gmask == gmask &&
-                pixfmt_op[i].bmask == bmask && 
-                pixfmt_op[i].bpp == bpp)
+            pixfmt_op[i].gmask == gmask &&
+            pixfmt_op[i].bmask == bmask && 
+            pixfmt_op[i].bpp == bpp)
             return pixfmt_op[i].op;
     }
     return NULL;
@@ -430,6 +430,18 @@ static inline BYTE* _mem_set_pixel (BYTE* dst, int bpp, Uint32 pixel)
     return dst + bpp;
 }
 
+#define direct_graphic_save_copy_pixel   do{\
+       Uint8 *dst_pixel, *src_pixel;\
+       gal_pixel pixel;\
+       Uint8 r, g, b, a;\
+       dst_pixel = dst + (dst_rc->left + step) * dst_bytes_per_pixel;\
+       src_pixel = src + step * ctxt->src_bytes_per_pixel;\
+       pixel = _mem_get_pixel(src_pixel, ctxt->src_bytes_per_pixel);\
+       Pixel2RGBA(ctxt->pg->hdc, pixel, &r, &g, &b, &a);\
+       pixel = RGBA2Pixel(dst_hdc, r, g, b, a);\
+       _mem_set_pixel(dst_pixel, dst_bytes_per_pixel, pixel);\
+	   step++;} while(0)
+
 static void 
 direct_graphic_save (HDC dst_hdc, Uint8* dst_pixels,
         int dst_pitch, int dst_bytes_per_pixel, const RECT* dst_rc, void* content)
@@ -445,6 +457,27 @@ direct_graphic_save (HDC dst_hdc, Uint8* dst_pixels,
          (ctxt->sx+ off_x) * ctxt->src_bytes_per_pixel;
    while ( height-- ) {
        int step = 0;
+#ifdef WIN32
+       DUFFS_LOOP(direct_graphic_save_copy_pixel
+		   /*
+           (
+               {
+                   Uint8 *dst_pixel, *src_pixel;
+                   gal_pixel pixel;
+                   Uint8 r, g, b, a;
+                   dst_pixel = dst + (dst_rc->left + step) * dst_bytes_per_pixel;
+                   src_pixel = src + step * ctxt->src_bytes_per_pixel;
+
+                   pixel = _mem_get_pixel(src_pixel, ctxt->src_bytes_per_pixel);
+                   Pixel2RGBA(ctxt->pg->hdc, pixel, &r, &g, &b, &a);
+                   pixel = RGBA2Pixel(dst_hdc, r, g, b, a);
+
+                   _mem_set_pixel(dst_pixel, dst_bytes_per_pixel, pixel);
+                   step++;
+               }
+           )*/, 
+           width);
+#else
        DUFFS_LOOP(
            (
                {
@@ -463,6 +496,7 @@ direct_graphic_save (HDC dst_hdc, Uint8* dst_pixels,
                }
            ), 
            width);
+#endif
 
        src += ctxt->src_pitch;
        dst += dst_pitch;
@@ -641,6 +675,7 @@ MGPlusGraphicDelete (HGRAPHICS graphics)
         }
         i ++;
     }
+
     if (pg->clip_ras.buf) {
         delete [] pg->clip_ras.buf; 
     }
@@ -1483,10 +1518,12 @@ MGPlusGraphicUnLoadBitmap (HGRAPHICS graphics, int n_index)
     if (n_index > MAX_BMP_NUM || n_index < 0)
         return MP_INDEX_NOT_MATCH;
 
+#ifndef _MG_MINIMALGDI
     if (pgs->surf_img [n_index]) {
         UnloadBitmap(pgs->surf_img[n_index]);
     }
     return MP_OK;
+#endif
 }
 
 PBITMAP
@@ -1507,6 +1544,7 @@ MGPlusGraphicGetBitmap (HGRAPHICS graphics, int n_index)
 MPStatus 
 MGPlusGraphicLoadBitmapFromFile(HGRAPHICS graphics, int n_index, char* file)
 {
+#ifndef _MG_MINIMALGDI
     MPGraphics *pgs = (MPGraphics *)graphics;
     HDC hdc;
 
@@ -1532,6 +1570,9 @@ MGPlusGraphicLoadBitmapFromFile(HGRAPHICS graphics, int n_index, char* file)
                 pgs->surf_img [n_index]->bmPitch);
 
     return MP_OK;
+#else
+    return MP_GENERIC_ERROR;
+#endif
 }
 
 #ifdef _MGPLUS_FONT_FT2
@@ -1667,7 +1708,9 @@ int MGPlusSaveHG (HGRAPHICS hg)
     hg_state->next = NULL;
     hg_state->prev = NULL;
 
+#ifndef _MG_MINIMALGDI
     pthread_once(&once_control, init_routine);
+#endif
     LOCK (&lock);
 
     nr_hg_states ++;

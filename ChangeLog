@@ -1,6 +1,9 @@
 *******************************************************************************
-What's new in tunck
-2017/10/26. CLEANUP: merge from rel-3-0
+What's new in trunck
+
+11/01. CLEANUP: merge from rel-3-0 manually.
+
+10/26-2017. CLEANUP: merge from rel-3-0
 	*  svn merge -r 1207:1246 ^/branches/rel-3-0
 
 *******************************************************************************

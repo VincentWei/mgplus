@@ -1230,7 +1230,7 @@ static char* gui_GetIconFile(const char* rdr_name, char* file, char* _szValue)
     return _szValue;
 }
 
-#if 0
+/* defined but not used
 static BOOL gui_LoadIconRes(HDC hdc, const char* rdr_name, char* file) 
 {
     FUNCTION_SCOPE_TIMING();
@@ -1246,7 +1246,7 @@ static BOOL gui_LoadIconRes(HDC hdc, const char* rdr_name, char* file)
 
     return FALSE;
 }
-#endif
+*/
 
 static void 
 draw_fold (HWND hWnd, HDC hdc, const RECT* pRect, 
@@ -2740,8 +2740,9 @@ static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
     RECT    rect_line;
     gal_pixel pixels[2];
 
-    HPATH   path=NULL;
-    HBRUSH  brush=NULL;
+    HPATH   path = 0;
+    HBRUSH  brush = 0;
+
     SetRectEmpty (&icon_rect);
     win_info = GetWindowInfo(hWnd);
 
@@ -2920,6 +2921,7 @@ static void draw_caption (HWND hWnd, HDC hdc, BOOL is_active)
                 gradient_color(cb, LFRDR_3DBOX_COLOR_DARKER, 100)));
     MoveTo (hdc_graphic, rc_tmp_down.left, rc_tmp_down.top);
     LineTo (hdc_graphic, rc_tmp_down.right - 10, rc_tmp_down.top);
+
     SetPenColor (hdc_graphic, 
             DWORD2PIXEL (hdc_graphic, 
                 gradient_color(cb, LFRDR_3DBOX_COLOR_LIGHTER, 100)));
@@ -3743,8 +3745,6 @@ static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
                 LineTo (hdc, rc_thumb.right, rc_thumb.bottom - 1);
                 LineTo (hdc, rc_thumb.right, rc_thumb.top);
                 LineTo (hdc, rc_thumb.left, rc_thumb.top);
-//                MoveTo (hdc, rc_thumb.right, rc_thumb.top + 1);
-//                LineTo (hdc, rc_thumb.right, rc_thumb.bottom - 2);
 
             }
             MGPlusGraphicDelete (graphic);
@@ -3763,7 +3763,7 @@ static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
                         gradient_color (fgc_dis, 
                             LFRDR_3DBOX_COLOR_DARKER, 10)));
             Rectangle(hdc, rect.left, 
-                    rect.top, rect.right-1, rect.bottom-1);
+                    rect.top, rect.right - 1, rect.bottom - 1);
 
             pixels[0] = mp_gradient_color(bgc, LFRDR_3DBOX_COLOR_LIGHTER, 20);
             pixels[1] = mp_gradient_color (bgc, LFRDR_3DBOX_COLOR_LIGHTER, 200);
@@ -3806,7 +3806,8 @@ static void draw_scrollbar (HWND hWnd, HDC hdc, int sb_pos)
 
             if (0 == calc_fn(hWnd, HT_SB_DOWNARROW, &rc_down_arrow))
             {
-                // DK: Add for fix the bug that both arrow button change to hilite/pressed at one time.
+                // DK: Add for fix the bug that both arrow button change to 
+                // hilite/pressed state at one time.
                 bn_status = 0;
                 rc_back.bottom -= RECTH (rc_down_arrow) - 1;
                 sb_status = get_scroll_status (hWnd, TRUE);
@@ -4407,6 +4408,7 @@ draw_tab (HWND hWnd, HDC hdc, RECT *rect, char *title, DWORD color,
     eff_len = GetTextExtentPoint (hdc, title, strlen(title), 
                   text_extent, &eff_chars, NULL, NULL, &size);
 
+    SetBkMode (hdc, BM_TRANSPARENT);
     TextOutLen (hdc, x + 2, ty, title, eff_len);
 }
 

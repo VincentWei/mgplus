@@ -13,4 +13,4 @@ HDR_FILES = path.h graphics.h pen.h brush.h self_stroke.h
 libapi_la_SOURCES = $(SRC_FILES) $(HDR_FILES)
 LIB_NAME=libapi
 
-EXTRA_DIST=$(SRC_FILES) opt_basic.cpp
+EXTRA_DIST = $(SRC_FILES) opt_basic.cpp

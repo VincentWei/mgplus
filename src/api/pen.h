@@ -25,7 +25,7 @@ typedef struct _MPPen {
     int            line_join_e;
     int            line_cap_e;
     unsigned char* dash;
-    int            num_dashes;
+    unsigned int   num_dashes;
     int            dash_phase;
     double         miter_limit;
 } MPPen;
