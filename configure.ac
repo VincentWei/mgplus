@@ -97,13 +97,10 @@ AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([bzero dup2 getcwd memmove memset putenv strchr strdup strerror strstr])
 
-have_libminigui="no"
-AC_CHECK_HEADERS(minigui/common.h, have_libminigui=yes, foo=bar)
-
 build_fashion_lfrdr="yes"
 build_colorcomposite_support="yes"
 build_gradientfill_support="yes"
-build_ft2_support="no"
+build_ft2_support="yes"
 #pixfmt_argb32_support="yes"
 pixfmt_rgba32_support="yes"
 pixfmt_abgr32_support="yes"
@@ -185,8 +182,6 @@ if test "x$build_gradientfill_support" = "xyes"; then
 fi
 
 if test "x$build_ft2_support" == "xyes"; then
-    build_unicode_support="yes"
-
     AC_DEFINE(_MGPLUS_FONT_FT2, 1,
              [Define if support TrueType font based on FreeType2])
 fi
@@ -237,24 +232,26 @@ else
   LIB_SUFFIX="_$with_libsuffix"
 fi
 
+AC_SUBST(LIB_SUFFIX)
+
 dnl Check for FreeType library
 if test "x$build_ft2_support" != "xno"; then
     AC_CHECK_LIB(freetype, FT_Library_Version,
         APP_LIBS="$APP_LIBS `freetype-config --libs`", 
         build_ft2_support=no)
 
-    #CFLAGS="$CFLAGS `freetype-config --cflags`"
-    #CXXFLAGS="$CXXFLAGS `freetype-config --cflags`"
+    CFLAGS="$CFLAGS `freetype-config --cflags`"
+    CXXFLAGS="$CXXFLAGS `freetype-config --cflags`"
 fi
 
 CFLAGS="$CFLAGS -D__MGPLUS_LIB__"
 CXXFLAGS="$CXXFLAGS -D__MGPLUS_LIB__"
 
-AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
-
 if test "$ac_cv_prog_gcc" = "yes"; then
     CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -pipe"
 fi
+
+AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
 
 dnl ========================================================================
 dnl check for run-time mode of MiniGUI
@@ -262,38 +259,19 @@ dnl ========================================================================
 threads_version="no"
 AC_CHECK_DECLS(_MGRM_THREADS, threads_version="yes", foo=bar, [#include <minigui/common.h>])
 
-#if test "x$threads_version" = "xyes"; then
-#    CFLAGS="$CFLAGS -D_REENTRANT"
-#    if test "x$with_libsuffix" = "x"; then
-#        LIBS="$LIBS -lminigui_ths -lpthread"
-#    fi
-#    APP_LIBS="$APP_LIBS -lminigui_ths -lpthread"
-#else
-#    if test "x$with_libsuffix" = "x"; then
-#        LIBS="$LIBS -lminigui_procs"
-#    fi
-#    APP_LIBS="$APP_LIBS -lminigui_procs"
-#fi
+PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.0.10])
 
-APP_LIBS="$APP_LIBS -lstdc++"
-
-AC_SUBST(LIB_SUFFIX)
+APP_LIBS="$APP_LIBS $MINIGUI_LIBS -lstdc++"
 AC_SUBST(APP_LIBS)
 
 dnl AC_CONFIG_FILES
-AC_OUTPUT([Makefile mgplus.pc
-         include/Makefile
-         cmake/Makefile
-         src/Makefile
-         src/agg/Makefile
-         src/api/Makefile
-         m4/Makefile])
-
-if test "x$have_libminigui" != "xyes"; then
-    AC_MSG_WARN([
-        MiniGUI is not properly installed on the system. You need 
-        MiniGUI Ver 3.0.x or later for building this package. 
-        Please configure and install MiniGUI Ver 3.0.x first.
-    ])
-fi
+AC_OUTPUT([
+        Makefile mgplus.pc
+        include/Makefile
+        cmake/Makefile
+        src/Makefile
+        src/agg/Makefile
+        src/api/Makefile
+        m4/Makefile
+])
 

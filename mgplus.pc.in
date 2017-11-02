@@ -4,9 +4,9 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: mGPlus
-Description: A MiniGUI component which provides support for advanced 2D graphics functions.
+Description: A MiniGUI component which provides support for advanced 2D verctorial graphics functions.
 Version: @MGPLUS_VERSION@
-Requires:
-Libs: -L${libdir} -lmgplus@LIB_SUFFIX@ @PC_LIBS@
+Requires: minigui
+Libs: -L${libdir} -lmgplus@LIB_SUFFIX@
 Libs.private:
-Cflags: -I${includedir} @MGPLUS_INCLUDE_LIST@
+Cflags: -I${includedir} 
