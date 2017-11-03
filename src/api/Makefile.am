@@ -1,6 +1,6 @@
 SUBDIRS=
 
-AM_CPPFLAGS=-I.. -I../agg -I../../include -I../agg/font_freetype
+AM_CPPFLAGS=-D__MGPLUS_LIB__ -I.. -I../agg -I../../include -I../agg/font_freetype
 
 noinst_LTLIBRARIES=libapi.la
 

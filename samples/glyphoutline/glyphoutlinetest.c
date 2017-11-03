@@ -7,7 +7,6 @@
 #include <minigui/window.h>
 
 #include <mgplus/mgplus.h>
-#include <mgplus/mgplus.h>
 #include <mgutils/mgutils.h>
 
 #define ID_MP_GLYPH_REN_NATIVE_MONO               101

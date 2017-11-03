@@ -6,9 +6,9 @@
 #include <minigui/gdi.h>
 #include <minigui/window.h>
 
-#include <mgplus/mgplus.h>
-#include <mgplus/mgplus.h>
 #include <mgutils/mgutils.h>
+
+#include <mgplus/mgplus.h>
 
 #define ID_AddPath            103
 

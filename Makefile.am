@@ -8,7 +8,7 @@ libmgplusconfigdir = $(includedir)/mgplus
 # Which header files to install
 libmgplusconfig_HEADERS = $(COMM_HDRS)
 
-EXTRA_DIST = INSTALL README autogen.sh
+EXTRA_DIST = README.md RELEASE-NOTES.md INSTALL autogen.sh samples
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = mgplus.pc

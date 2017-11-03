@@ -1,4 +1,4 @@
-UTOMAKE_OPTIONS=foreign
+AUTOMAKE_OPTIONS=foreign
 
 SUBDIRS = animate src path pen tcldemo glyphoutline colorcomposite
 

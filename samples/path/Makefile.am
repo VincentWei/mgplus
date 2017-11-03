@@ -8,3 +8,4 @@ pathtest_SOURCES= pathtest.c
 
 pathtest_LDADD = -lmgplus @APP_LIBS@
 
+EXTRA_DIST=res

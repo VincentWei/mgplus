@@ -1,5 +1,7 @@
 AUTOMAKE_OPTIONS=subdir-objects
-AM_CPPFLAGS=
+
+AM_CPPFLAGS=-D__MGPLUS_LIB__
+
 SUBDIRS=
 
 noinst_LTLIBRARIES = libagg.la

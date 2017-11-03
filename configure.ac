@@ -233,6 +233,7 @@ else
 fi
 
 AC_SUBST(LIB_SUFFIX)
+AM_CONDITIONAL(MGPLUS_NOSUFFIX, test "x$with_libsuffix" = "x")
 
 DEP_LIBS=
 dnl Check for FreeType library
@@ -241,20 +242,15 @@ if test "x$build_ft2_support" != "xno"; then
         foo=bar,
         build_ft2_support=no)
 
-    CFLAGS="$CFLAGS `freetype-config --cflags`"
-    CXXFLAGS="$CXXFLAGS `freetype-config --cflags`"
-fi
-
-if test "x$build_ft2_support" != "xno"; then
     FT2_CFLAGS="`freetype-config --cflags`"
     FT2_LIBS="`freetype-config --libs`"
 fi
 
-CFLAGS="$CFLAGS $FT2_CFLAGS -D__MGPLUS_LIB__"
-CXXFLAGS="$CXXFLAGS $FT2_CFLAGS -D__MGPLUS_LIB__"
 if test "$ac_cv_prog_gcc" = "yes"; then
     CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -pipe"
 fi
+
+CPPFLAGS="$CPPFLAGS $FT2_CFLAGS"
 DEP_LIBS="$DEP_LIBS $FT2_LIBS -lstdc++"
 
 AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
@@ -267,18 +263,32 @@ AC_CHECK_DECLS(_MGRM_THREADS, threads_version="yes", foo=bar, [#include <minigui
 
 PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.0.10])
 
-APP_LIBS="$APP_LIBS $MINIGUI_LIBS $DEP_LIBS"
+APP_LIBS="$APP_LIBS -lmgplus$LIB_SUFFIX $MINIGUI_LIBS $DEP_LIBS"
 AC_SUBST(APP_LIBS)
 AC_SUBST(DEP_LIBS)
 
 dnl AC_CONFIG_FILES
 AC_OUTPUT([
-        Makefile mgplus.pc
-        include/Makefile
+        mgplus.pc
+        Makefile
+        m4/Makefile
         cmake/Makefile
+        include/Makefile
         src/Makefile
         src/agg/Makefile
         src/api/Makefile
-        m4/Makefile
+        samples/Makefile
+        samples/animate/Makefile
+        samples/animate/common_animates/Makefile
+        samples/src/Makefile
+        samples/src/res/Makefile
+        samples/pen/Makefile 
+        samples/path/Makefile 
+        samples/brush/Makefile 
+        samples/colorcomposite/Makefile 
+        samples/tcldemo/Makefile 
+        samples/tcldemo/res/Makefile 
+        samples/glyphoutline/Makefile 
+        samples/worldtransform/Makefile 
 ])
 
