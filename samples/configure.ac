@@ -45,43 +45,21 @@ AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([bzero dup2 getcwd memmove memset putenv strchr strdup strerror strstr])
 
-have_libminigui="no"
-AC_CHECK_HEADERS(minigui/common.h, have_libminigui=yes, foo=bar)
+PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.0.10])
+PKG_CHECK_MODULES([MGPLUS], [mgplus >= 1.2.0])
+APP_LIBS="$APP_LIBS $MGPLUS_LIBS $MINIGUI_LIBS"
 
 dnl ========================================================================
 dnl check for run-time mode of MiniGUI
 dnl ========================================================================
 threads_version="no"
 AC_CHECK_DECLS(_MGRM_THREADS, threads_version="yes", foo=bar, [#include <minigui/common.h>])
-
+AM_CONDITIONAL(MGRM_THREADS, test "x$threads_version" = "xyes")
 procs_version="no"
 AC_CHECK_DECLS(_MGRM_PROCESSES, procs_version="yes", foo=bar, [#include <minigui/common.h>])
-
+AM_CONDITIONAL(MGRM_PROCESSES, test "x$procs_version" = "xyes")
 standalone_version="no"
 AC_CHECK_DECLS(_MGRM_STANDALONE, standalone_version="yes", foo=bar, [#include <minigui/common.h>])
-
-if test "x$threads_version" = "xyes"; then
-    CFLAGS="$CFLAGS -D_REENTRANT"
-    APP_LIBS="$APP_LIBS -lpthread -lminigui_ths -lstdc++ -ldl"
-else
-if test "x$standalone_version" = "xyes"; then
-    CFLAGS="$CFLAGS -D_REENTRANT"
-    APP_LIBS="$APP_LIBS -lminigui_sa -lstdc++ -ldl"
-else
-    APP_LIBS="$APP_LIBS -lminigui_procs -lstdc++ -ldl"
-fi  
-fi
-
-AC_CHECK_DECLS(_HAVE_MATH_LIB, APP_LIBS="$APP_LIBS -lm", foo=bar, [#include <minigui/common.h>])
-AC_CHECK_DECLS(_MGIMAGE_PNG, APP_LIBS="$APP_LIBS -lpng", foo=bar, [#include <minigui/common.h>])
-AC_CHECK_DECLS(_MGIMAGE_PNG, APP_LIBS="$APP_LIBS -lpthread", foo=bar, [#include <minigui/common.h>])
-AC_CHECK_DECLS(_MGIMAGE_JPG, APP_LIBS="$APP_LIBS -ljpeg", foo=bar, [#include <minigui/common.h>])
-AC_CHECK_DECLS(_MGFONT_TTF, APP_LIBS="$APP_LIBS -lttf", foo=bar, [#include <minigui/common.h>])
-AC_CHECK_DECLS(_MGFONT_FT2, APP_LIBS="$APP_LIBS -lfreetype", foo=bar, [#include <minigui/common.h>])
-AC_CHECK_DECLS(_MGFONT_SEF, APP_LIBS="$APP_LIBS -lscripteasy", foo=bar, [#include <minigui/common.h>])
-
-AM_CONDITIONAL(MGRM_THREADS, test "x$threads_version" = "xyes")
-AM_CONDITIONAL(MGRM_PROCESSES, test "x$procs_version" = "xyes")
 AM_CONDITIONAL(MGRM_STANDALONE, test "x$standalone_version" = "xyes")
 
 if test "$ac_cv_prog_gcc" = "yes"; then
@@ -91,26 +69,18 @@ fi
 AC_SUBST(APP_LIBS)
 
 AC_OUTPUT(
-Makefile
-animate/Makefile
-animate/common_animates/Makefile
-src/Makefile
-src/res/Makefile
-pen/Makefile 
-path/Makefile 
-brush/Makefile 
-colorcomposite/Makefile 
-dnl tcldemo/Makefile 
-dnl tcldemo/res/Makefile 
-glyphoutline/Makefile 
-worldtransform/Makefile 
-
+    Makefile
+    animate/Makefile
+    animate/common_animates/Makefile
+    src/Makefile
+    src/res/Makefile
+    pen/Makefile 
+    path/Makefile 
+    brush/Makefile 
+    colorcomposite/Makefile 
+    tcldemo/Makefile 
+    tcldemo/res/Makefile 
+    glyphoutline/Makefile 
+    worldtransform/Makefile 
 )
 
-if test "x$have_libminigui" != "xyes"; then
-    AC_MSG_WARN([
-		MiniGUI is not properly installed on the system. You need 
-        MiniGUI Ver 2.2.x or later for building this package. 
-        Please configure and install MiniGUI Ver 2.2.x first.
-    ])
-fi

@@ -1,4 +1,4 @@
-INCLUDES = -I../animate -I../animate/common_animates
+AM_CPPFLAGS = -I../animate -I../animate/common_animates
 
 COMMON_PROGS = tcldemo 
 

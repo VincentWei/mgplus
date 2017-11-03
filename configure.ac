@@ -234,22 +234,28 @@ fi
 
 AC_SUBST(LIB_SUFFIX)
 
+DEP_LIBS=
 dnl Check for FreeType library
 if test "x$build_ft2_support" != "xno"; then
     AC_CHECK_LIB(freetype, FT_Library_Version,
-        APP_LIBS="$APP_LIBS `freetype-config --libs`", 
+        foo=bar,
         build_ft2_support=no)
 
     CFLAGS="$CFLAGS `freetype-config --cflags`"
     CXXFLAGS="$CXXFLAGS `freetype-config --cflags`"
 fi
 
-CFLAGS="$CFLAGS -D__MGPLUS_LIB__"
-CXXFLAGS="$CXXFLAGS -D__MGPLUS_LIB__"
+if test "x$build_ft2_support" != "xno"; then
+    FT2_CFLAGS="`freetype-config --cflags`"
+    FT2_LIBS="`freetype-config --libs`"
+fi
 
+CFLAGS="$CFLAGS $FT2_CFLAGS -D__MGPLUS_LIB__"
+CXXFLAGS="$CXXFLAGS $FT2_CFLAGS -D__MGPLUS_LIB__"
 if test "$ac_cv_prog_gcc" = "yes"; then
     CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -pipe"
 fi
+DEP_LIBS="$DEP_LIBS $FT2_LIBS -lstdc++"
 
 AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
 
@@ -261,8 +267,9 @@ AC_CHECK_DECLS(_MGRM_THREADS, threads_version="yes", foo=bar, [#include <minigui
 
 PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.0.10])
 
-APP_LIBS="$APP_LIBS $MINIGUI_LIBS -lstdc++"
+APP_LIBS="$APP_LIBS $MINIGUI_LIBS $DEP_LIBS"
 AC_SUBST(APP_LIBS)
+AC_SUBST(DEP_LIBS)
 
 dnl AC_CONFIG_FILES
 AC_OUTPUT([
