@@ -567,7 +567,7 @@ MGPlusGetGraphicDC (HGRAPHICS graphic)
 {
     MPGraphics *pg = (MPGraphics *)graphic;
     if(!pg)
-        return MP_GENERIC_ERROR;
+        return HDC_INVALID;
 
     return pg->hdc;
 }
