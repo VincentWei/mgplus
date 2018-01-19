@@ -251,10 +251,6 @@ if test "x$build_ft2_support" != "xno"; then
     FT2_LIBS="`freetype-config --libs`"
 fi
 
-if test "$ac_cv_prog_gcc" = "yes"; then
-    fi
-fi
-
 if test "x$devel_mode" = "xyes"; then
     if test "$ac_cv_prog_gcc" = "yes"; then
         CPPFLAGS="$CPPFLAGS -Werror -Wall"
