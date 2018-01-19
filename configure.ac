@@ -252,15 +252,14 @@ if test "x$build_ft2_support" != "xno"; then
 fi
 
 if test "$ac_cv_prog_gcc" = "yes"; then
-    CFLAGS="$CPPFLAGS -Wstrict-prototypes"
-    CPPFLAGS="$CPPFLAGS -Wall"
-    if test "x$devel_mode" = "xyes"; then
-        CPPFLAGS="$CPPFLAGS -Werror"
     fi
 fi
 
 if test "x$devel_mode" = "xyes"; then
-    CPPFLAGS="$CPPFLAGS -D_DEBUG"
+    if test "$ac_cv_prog_gcc" = "yes"; then
+        CPPFLAGS="$CPPFLAGS -Werror -Wall"
+        CFLAGS="$CFLAGS -Wstrict-prototypes"
+    fi
 fi
 
 CPPFLAGS="$CPPFLAGS $FT2_CFLAGS"
