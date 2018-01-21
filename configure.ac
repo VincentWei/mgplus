@@ -267,11 +267,8 @@ DEP_LIBS="$DEP_LIBS $FT2_LIBS -lpthread -lstdc++"
 AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
 
 dnl ========================================================================
-dnl check for run-time mode of MiniGUI
+dnl check the installation of MiniGUI
 dnl ========================================================================
-threads_version="no"
-AC_CHECK_DECLS(_MGRM_THREADS, threads_version="yes", foo=bar, [#include <minigui/common.h>])
-
 PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.2.0])
 
 APP_LIBS="$APP_LIBS -lmgplus$LIB_SUFFIX $MINIGUI_LIBS $DEP_LIBS"
