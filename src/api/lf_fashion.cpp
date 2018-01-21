@@ -1407,7 +1407,7 @@ static void draw_hilite_menu_item
 {
     FUNCTION_SCOPE_TIMING();
     gal_pixel pixels[3];
-    int corner, l, t, r, b;
+    int l, t, r, b;
 
     pixels [1] = MPMakeARGB (GetRValue (color), GetGValue (color), GetBValue (color),
             GetAValue (color));
@@ -1418,7 +1418,6 @@ static void draw_hilite_menu_item
             (RECT*)pRect, pixels, 3);
 
     /*draw border*/
-    corner = 1;
     l = pRect->left;
     t = pRect->top;
     r = pRect->right;
@@ -3058,11 +3057,8 @@ draw_caption_button (HWND hWnd, HDC hdc, int ht_code, int status)
 
     int i, w, h;
     RECT rect;
-    gal_pixel old_col;
     DWORD cap_c, alp_c;
         
-    old_col = GetPenColor(hdc);
-
     gal_pixel pixels[3];
     RECT rc_close;
     gal_pixel fgc_3d;
@@ -3136,7 +3132,7 @@ draw_caption_button (HWND hWnd, HDC hdc, int ht_code, int status)
                 cy = (rc_close.top + rc_close.bottom) >> 1;
                 r = (RECTH (rc_close) >> 1) - 1;
 
-                MPPOINT pt = {cx, cy};
+                MPPOINT pt = {(float)cx, (float)cy};
                 RECT rc={cx-r, cy-r, cx+r, cy+r};
 
                 HGRAPHICS graphic = MGPlusGraphicCreate (RECTW (rect), RECTH (rect));
@@ -3242,7 +3238,7 @@ draw_caption_button (HWND hWnd, HDC hdc, int ht_code, int status)
                 cy = (rc_close.top + rc_close.bottom) >> 1;
                 r = (RECTH (rc_close) >> 1) - 1;
 
-                MPPOINT pt = {cx, cy};
+                MPPOINT pt = {(float)cx, (float)cy};
                 RECT rc={cx-r, cy-r, cx+r, cy+r};
 
                 HGRAPHICS graphic = MGPlusGraphicCreate (RECTW (rect), RECTH (rect));
@@ -3342,7 +3338,7 @@ draw_caption_button (HWND hWnd, HDC hdc, int ht_code, int status)
                 cy = (rc_close.top + rc_close.bottom) >> 1;
                 r = (RECTH (rc_close) >> 1) - 1;
 
-                MPPOINT pt = {cx, cy};
+                MPPOINT pt = {(float)cx, (float)cy};
                 RECT rc={cx-r, cy-r, cx+r, cy+r};
 
                 HGRAPHICS graphic = MGPlusGraphicCreate (RECTW (rect), RECTH (rect));

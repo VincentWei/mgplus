@@ -197,8 +197,8 @@ namespace agg
         {
             m_x = m_x0 = x;
             m_y = y;
-            if(y >= 0 && y < (int)m_pixf->height() &&
-               x >= 0 && x+len <= (int)m_pixf->width())
+            if(y >= 0 && (unsigned)y < m_pixf->height() &&
+               x >= 0 && (unsigned)x+len <= m_pixf->width())
             {
                 return m_pix_ptr = m_pixf->pix_ptr(x, y);
             }
