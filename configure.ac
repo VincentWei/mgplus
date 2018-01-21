@@ -253,13 +253,16 @@ fi
 
 if test "x$devel_mode" = "xyes"; then
     if test "$ac_cv_prog_gcc" = "yes"; then
-        CPPFLAGS="$CPPFLAGS -Werror -Wall"
-        CFLAGS="$CFLAGS -Wstrict-prototypes"
+        CPPFLAGS="$CPPFLAGS -Wall -Werror"
     fi
 fi
 
+if test "$ac_cv_prog_gcc" = "yes"; then
+    CFLAGS="$CFLAGS -Wstrict-prototypes -pipe"
+fi
+
 CPPFLAGS="$CPPFLAGS $FT2_CFLAGS"
-DEP_LIBS="$DEP_LIBS $FT2_LIBS -lstdc++"
+DEP_LIBS="$DEP_LIBS $FT2_LIBS -lpthread -lstdc++"
 
 AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
 
