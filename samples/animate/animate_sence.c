@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <pthread.h>
+#include <sys/time.h>
+
 #include <minigui/common.h>
 #include <minigui/minigui.h>
 #include <minigui/gdi.h>
@@ -7,7 +9,7 @@
 
 #include "animate.h"
 
-static inline DWORD getcurtime()
+static inline DWORD getcurtime(void)
 {
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
@@ -163,6 +165,7 @@ DRAWALL:
 }
 
 
+#if 0 /* not used */
 static void defDrawAnimate(HDC hdc, ANIMATE* a)
 {
 	FillBoxWithBitmap(hdc, GetAnimateX(a), GetAnimateY(a), GetAnimateW(a),GetAnimateH(a),(BITMAP*)a->img);
@@ -192,6 +195,7 @@ static void defWindowDraw(HDC hdc, ANIMATE* a)
 	MoveWindow((HWND)a->img, GetAnimateX(a), GetAnimateY(a), GetAnimateW(a), GetAnimateH(a), TRUE);
 }
 
+#endif
 
 /////////////////////////////////////////////
 //APIs
@@ -460,8 +464,9 @@ int StartThreadAnimateSence (ANIMATE_SENCE* as)
 	return 0;
 }
 
-static BOOL as_timer_draw(ANIMATE_SENCE* as, int speed, DWORD dw)
+static BOOL as_timer_draw(HWND hwnd, LINT speed, DWORD dw)
 {
+    ANIMATE_SENCE* as = (ANIMATE_SENCE*)hwnd;
 	DWORD cur_time = getcurtime();
 
 	if(as->timelines == NULL || (as->normal == NULL && as->topmost == NULL) ||

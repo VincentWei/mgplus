@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <sys/time.h>
 
 #include <minigui/common.h>
@@ -475,6 +476,9 @@ static void DrawCoverFlow (int nCount, BOOL bTurn)
     MPPOINT* pDstDownPoint = NULL;
     MPPOINT* pCurUpPoint = NULL;
     MPPOINT* pCurDownPoint = NULL;
+
+    /* prevent warning */
+    i = (int)((intptr_t)pSrcDownPoint & (intptr_t)pDstDownPoint);
 
     if (bTurn)
     {
@@ -1334,8 +1338,7 @@ static void InitCoverFlowNode (int nImgNumber)
 
 BOOL g_bStartUp = TRUE;
 
-static int
-CoverFlowProc (HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT CoverFlowProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {

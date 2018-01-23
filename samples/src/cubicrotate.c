@@ -218,8 +218,7 @@ void calc_rotate_coor(ANIMATE* ani, int frame_index, void* context)
 
 ROTATEINFO g_info;
 
-static int
-BlindDemoWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT BlindDemoWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {

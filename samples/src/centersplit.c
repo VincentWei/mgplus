@@ -161,8 +161,7 @@ static void Center4SplitAnimate(HDC hdc, const RECT *rt,
     }
 }
 
-static int
-BlindDemoWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT BlindDemoWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {

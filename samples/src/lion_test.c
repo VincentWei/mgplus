@@ -161,7 +161,7 @@ int  fill_lion (HGRAPHICS hgs, HBRUSH brush, HPATH path)
 {
 	const char* ptr = g_lion;
 	int npaths = 0;
-	ARGB color_current;
+	ARGB color_current = 0;
 	BOOL b_first = TRUE;
 
 	while(*ptr)
@@ -278,7 +278,7 @@ static int mgPlusShow (HDC hdc)
 
 	return 0;
 }
-static int mgPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT mgPlusWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{

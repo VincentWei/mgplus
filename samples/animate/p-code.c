@@ -33,12 +33,12 @@ PCODE_ENV* CreatePCodeEnv(PCODE_METHOD* method, int stack_size, int *argv)
 	}
 
 	env->main = method;
-	env->stack = (unsigned int*)malloc(sizeof(int)*(stack_size + method->argc));
+	env->stack = (intptr_t*)malloc(sizeof(intptr_t)*(stack_size + method->argc));
 	env->ip = 0;
 
 	//copy args into stack
 	if(method->argc > 0){
-		memcpy(env->stack, argv, sizeof(int)*method->argc);
+		memcpy(env->stack, argv, sizeof(intptr_t)*method->argc);
 	}
 
 	env->stack_top = method->argc;
@@ -55,7 +55,7 @@ void DeletePCodeEnv(PCODE_ENV* env)
 	}
 }
 
-int call_native_method(PCODE_NATIVE_METHOD *nmth, unsigned int *stack)
+int call_native_method(PCODE_NATIVE_METHOD *nmth, intptr_t *stack)
 {
 	int *argv = NULL;
 	if(nmth->argc > 0)
@@ -108,7 +108,7 @@ static char* ins_names[]={
 	"jg"
 };
 
-static void reportInsError(int errcode, unsigned char* ins, unsigned int* stack, unsigned int *stack_base)
+static void reportInsError(int errcode, unsigned char* ins, intptr_t* stack, intptr_t *stack_base)
 {
 	char szInsInfo[30];
 
@@ -151,7 +151,7 @@ static void reportInsError(int errcode, unsigned char* ins, unsigned int* stack,
 	stack --;
 	for(i=1; i<=16 && stack>= stack_base; stack --, i++)
 	{
-		fprintf(stderr,"\t%d", *stack);
+		fprintf(stderr,"\t%p", (void*)*stack);
 		if(i%4==0)
 			fprintf(stderr,"\n");
 	}
@@ -164,11 +164,11 @@ static void reportInsError(int errcode, unsigned char* ins, unsigned int* stack,
 int ExecutePCode(PCODE *pcode, PCODE_ENV* env)
 {
 	register unsigned char* ip, *ipend,* ipbegin;
-	register unsigned int* stack;
-	register unsigned int* stack_base;
+	register intptr_t* stack;
+	register intptr_t* stack_base;
 	register DO_USER_INSTR * entries = NULL;
 	register int user_instr_count = 0;
-	register void* param;
+	register void* param = NULL;
 	register int argc;
 	register int idx;
 	int error = pcieOk;
@@ -213,8 +213,8 @@ AGIN:
 			break;
 		case iconst:
 			ip ++;
-			PUSH(stack, *(unsigned int*)ip);
-			ip += sizeof(unsigned int);
+			PUSH(stack, *(intptr_t*)ip);
+			ip += sizeof(intptr_t);
 			break;
 		case iload:
 			{
@@ -246,7 +246,7 @@ AGIN:
 					error = pciePtrIsNull;
 					goto ERROR;
 				}
-				PUSH(stack, *((unsigned int*)stack_base[idx]));
+				PUSH(stack, *((intptr_t*)stack_base[idx]));
 				break;
 			}
 		case isave:
@@ -278,7 +278,7 @@ AGIN:
 					error = pciePtrIsNull;
 					goto ERROR;
 				}
-				*((unsigned int*)stack_base[idx]) = POP(stack);
+				*((intptr_t*)stack_base[idx]) = POP(stack);
 				break;
 			}
 		case call:
@@ -336,7 +336,7 @@ AGIN:
 				break;
 			}
 		case pop:
-			POP(stack);
+			stack--;
 			ip ++;
 			break;
 		case ret:	
@@ -349,7 +349,7 @@ AGIN:
 				}
 				stack = stack_base;
 				//restore caller's stack info
-				stack_base = (unsigned int*)stack[argc];
+				stack_base = (intptr_t*)stack[argc];
 				ip = (unsigned char*)stack[argc + 1];
 				env->main = (PCODE_METHOD*)stack[argc + 2];
 				argc = env->main->argc;
@@ -382,7 +382,7 @@ AGIN:
 		{
 			unsigned char* new_ip;
 			ip ++;
-			if((int)POP(stack) < 0)
+			if((intptr_t)POP(stack) < 0)
 			{
 				new_ip = ipbegin + *(unsigned short*)ip;
 				if( new_ip < ipbegin || new_ip >= ipend){
@@ -441,7 +441,8 @@ AGIN:
 		}
 		case iadd:
 			{
-				int result = (int)(POP(stack)) + (int)(POP(stack));
+				intptr_t result = (intptr_t)(POP(stack));
+                result += (intptr_t)(POP(stack));
 				PUSH(stack, result);
 				ip ++;
 			}
@@ -449,52 +450,53 @@ AGIN:
 		case isub:
 		case cmp:
 			{
-				int a1, a2;
-				a2 = (int)POP(stack);
-				a1 = (int)POP(stack);
+				intptr_t a1, a2;
+				a2 = (intptr_t)POP(stack);
+				a1 = (intptr_t)POP(stack);
 				PUSH(stack, (a1 - a2));
 				ip ++;
 				break;
 			}
 		case imul:
 			{
-				int result = (int)(POP(stack)) * (int)(POP(stack ));
+				intptr_t result = (intptr_t)(POP(stack));
+                result *= (intptr_t)(POP(stack ));
 				PUSH(stack, result);
 				ip ++;
 				break;
 			}
 		case idiv:
 			{
-				int a1, a2;
+				intptr_t a1, a2;
 				ip ++;
-				a2 = (int)POP(stack);
+				a2 = (intptr_t)POP(stack);
 				if( a2 == 0){
 					err_ip = ip - 1;
 					error = pcieDiv0;
 					goto ERROR;
 				}
-				a1 = (int)POP(stack);
+				a1 = (intptr_t)POP(stack);
 				PUSH(stack, (a1/a2));
 				break;
 			}
 		case imod:
 			{
-				int a1, a2;
+				intptr_t a1, a2;
 				ip ++;
-				a2 = (int)POP(stack);
+				a2 = (intptr_t)POP(stack);
 				if ( a2 == 0 ){
 					err_ip = ip - 1;
 					error = pcieDiv0;
 					goto ERROR;
 				}
-				a1 = (int)POP(stack);
+				a1 = (intptr_t)POP(stack);
 				PUSH(stack, (a1%a2));
 				break;
 			}
 		default:
 			if(entries && (*ip-max_pre_def_ins)< user_instr_count)
 			{
-				unsigned int * st = stack;
+				intptr_t * st = stack;
 				ip += (*entries[*ip-max_pre_def_ins])(ip, &st, param);
 				stack = st;
 				break;
@@ -521,8 +523,9 @@ ERROR:
 	else
 	{
 		reportInsError(error,err_ip,stack, stack_base);
-		return PCE_ERROR;
 	}
+
+	return PCE_ERROR;
 }
 
 
@@ -629,7 +632,7 @@ PCODE_METHOD_TABLE * LoadPCodeMethodsFromFile(const char* file, void (*on_load)(
 {
 	FILE* f;
 	PCODE_METHOD_TABLE* pmt = NULL;
-	PCODE_METHOD *method;
+
 	if(file == NULL)
 		return NULL;
 	
@@ -640,12 +643,12 @@ PCODE_METHOD_TABLE * LoadPCodeMethodsFromFile(const char* file, void (*on_load)(
 	pmt = (PCODE_METHOD_TABLE*)calloc(1,sizeof(PCODE_METHOD_TABLE));
 	
 	int idx;
-	fread(&pmt->method_count, 1, sizeof(int), f);
-	if(pmt->method_count <= 0)
-	{
-		fclose(f);
-		free(pmt);
-		return NULL;
+	if (fread(&pmt->method_count, sizeof(int), 1, f) < 1) {
+        goto error;
+    }
+
+	if(pmt->method_count <= 0) {
+        goto error;
 	}
 	
 	pmt->methods = (PCODE_METHOD**)calloc(1,sizeof(PCODE_METHOD*)*pmt->method_count);
@@ -661,10 +664,17 @@ PCODE_METHOD_TABLE * LoadPCodeMethodsFromFile(const char* file, void (*on_load)(
 		}
 		
 		pm = (PCODE_METHOD*)calloc(1,sizeof(PCODE_METHOD));
-		fread(&pm->argc, 1, sizeof(int),f);
-		fread(&pm->code_len, 1, sizeof(int),f);
+		if (fread(&pm->argc, sizeof(int), 1, f) < 1) {
+            goto error;
+        }
+		if (fread(&pm->code_len, sizeof(int), 1, f) < 1) {
+            goto error;
+        }
+
 		pm->codes = (unsigned char*)malloc(pm->code_len);
-		fread(pm->codes, pm->code_len, 1, f);
+		if (pm->codes == NULL || fread(pm->codes, pm->code_len, 1, f) < 1) {
+            goto error;
+        }
 		pmt->methods[idx] = pm;
 		if(on_load)
 			(*on_load)(pm, szname, param);
@@ -674,6 +684,10 @@ PCODE_METHOD_TABLE * LoadPCodeMethodsFromFile(const char* file, void (*on_load)(
 
 	return pmt;
 
+error:
+	fclose(f);
+	free(pmt);
+	return NULL;
 }
 
 void DeletePCodeMethods(PCODE_METHOD_TABLE* pmt)
@@ -699,9 +713,9 @@ void ResetPCodeExecute(PCODE_ENV* env)
 
 	while(env->calldepath > 0)
 	{
-		register unsigned int* stack;
+		register intptr_t* stack;
 		stack = env->stack + env->main->argc;
-		env->stack = (unsigned int*)stack[0];
+		env->stack = (intptr_t*)stack[0];
 		env->main = (PCODE_METHOD*)stack[2];	
 		env->calldepath --;
 	}

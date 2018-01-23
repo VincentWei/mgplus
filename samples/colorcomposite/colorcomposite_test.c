@@ -68,7 +68,7 @@ void CompositeDraw(HWND hWnd, HGRAPHICS graphics)
     EndPaint(hWnd, hdc);
 }
 
-int ColorCompositeProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+LRESULT ColorCompositeProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HGRAPHICS graphics;
 

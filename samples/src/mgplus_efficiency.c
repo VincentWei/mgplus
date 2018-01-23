@@ -31,7 +31,7 @@ static BITMAP g_stTestBitmap;
 
 static int test_count = 1000;
 
-static int r()
+static int r(void)
 {
     return rand()%(RECTW(g_rcScr)) + 10;
 }
@@ -40,7 +40,7 @@ void test_func_draw_line(HGRAPHICS hgs, HPEN pen)
 {
     int i = 0;
     HDC hdc = MGPlusGetGraphicDC (hgs);
-    int s_tick = GetTickCount();
+    DWORD s_tick = GetTickCount();
 
     MGPlusSaveHG(hgs);
     //MGPlusSetSmoothingMode (hgs, MP_SMOOTHING_QUALITY);
@@ -54,7 +54,7 @@ void test_func_draw_line(HGRAPHICS hgs, HPEN pen)
         //printf("x1=%d,y1=%d,x2=%d,y2=%d\n", x1, y1, x2, y2);
         MGPlusDrawLine(hgs, pen, x1, y1, x2, y2);
     }
-    printf("test_func_draw_line: mgplus used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_draw_line: mgplus used time %ld\n", GetTickCount() - s_tick);
     SaveGraphics(hgs, private_dc, 0, canvas_mode);
     sleep(1);
     s_tick = GetTickCount();
@@ -70,7 +70,7 @@ void test_func_draw_line(HGRAPHICS hgs, HPEN pen)
         LineEx(hdc, x1, y1, x2, y2);
     }
     MGPlusRestoreHG(hgs, 1);
-    printf("test_func_draw_line: minigui used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_draw_line: minigui used time %ld\n", GetTickCount() - s_tick);
     SaveGraphics(hgs, hdc, 0, canvas_mode);
 }
 
@@ -78,7 +78,7 @@ void test_func_fill_rect(HGRAPHICS hgs, HBRUSH hbrush)
 {
     int i = 0;
     HDC hdc = MGPlusGetGraphicDC (hgs);
-    int s_tick = GetTickCount();
+    DWORD s_tick = GetTickCount();
 
     MGPlusSaveHG(hgs);
     //MGPlusSetSmoothingMode (hgs, MP_SMOOTHING_QUALITY);
@@ -91,7 +91,7 @@ void test_func_fill_rect(HGRAPHICS hgs, HBRUSH hbrush)
         int y2 = 100;
         MGPlusFillRectangle(hgs, hbrush, x1, y1, x2, y2);
     }
-    printf("test_func_fill_rect: mgplus used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_fill_rect: mgplus used time %ld\n", GetTickCount() - s_tick);
     SaveGraphics(hgs, private_dc, 0, canvas_mode);
     sleep(1);
     s_tick = GetTickCount();
@@ -105,14 +105,14 @@ void test_func_fill_rect(HGRAPHICS hgs, HBRUSH hbrush)
         FillBox(hdc, x1, y1, x2, y2);
     }
     MGPlusRestoreHG(hgs, 1);
-    printf("test_func_fill_rect: minigui used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_fill_rect: minigui used time %ld\n", GetTickCount() - s_tick);
 }
 
 void test_func_draw_rect(HGRAPHICS hgs, HPEN hpen)
 {
     int i = 0;
     HDC hdc = MGPlusGetGraphicDC (hgs);
-    int s_tick = GetTickCount();
+    DWORD s_tick = GetTickCount();
 
     MGPlusSaveHG(hgs);
     //MGPlusSetSmoothingMode (hgs, MP_SMOOTHING_QUALITY);
@@ -125,7 +125,7 @@ void test_func_draw_rect(HGRAPHICS hgs, HPEN hpen)
         int y2 = 100;
         MGPlusDrawRectangle(hgs, hpen, x1, y1, x2, y2);
     }
-    printf("test_func_draw_rect: mgplus used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_draw_rect: mgplus used time %ld\n", GetTickCount() - s_tick);
     SaveGraphics(hgs, private_dc, 0, canvas_mode);
     sleep(1);
     s_tick = GetTickCount();
@@ -137,14 +137,14 @@ void test_func_draw_rect(HGRAPHICS hgs, HPEN hpen)
         Rectangle(hdc, x1, y1, x2, y2);
     }
     MGPlusRestoreHG(hgs, 1);
-    printf("test_func_draw_rect: minigui used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_draw_rect: minigui used time %ld\n", GetTickCount() - s_tick);
 }
 
 void test_func_fill_bitmap(HGRAPHICS hgs)
 {
     int i = 0;
     HDC hdc = MGPlusGetGraphicDC (hgs);
-    int s_tick = GetTickCount();
+    DWORD s_tick = GetTickCount();
 
     MGPlusSaveHG(hgs);
     //MGPlusSetSmoothingMode (hgs, MP_SMOOTHING_QUALITY);
@@ -159,7 +159,7 @@ void test_func_fill_bitmap(HGRAPHICS hgs)
     for(i = 0; i < test_count; i++) {
         MGPlusDrawImageWithPoints (hgs, 0, points, 4);
     }
-    printf("test_func_fill_bitmap: minigui used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_fill_bitmap: minigui used time %ld\n", GetTickCount() - s_tick);
     SaveGraphics(hgs, private_dc, 0, canvas_mode);
     sleep(1);
 
@@ -167,7 +167,7 @@ void test_func_fill_bitmap(HGRAPHICS hgs)
     for(i = 0; i < test_count; i++) {
         FillBoxWithBitmap(hdc, 100, 100, -1, -1, &g_stTestBitmap);
     }
-    printf("test_func_fill_bitmap: mgplus used time %d\n", GetTickCount() - s_tick);
+    printf("test_func_fill_bitmap: mgplus used time %ld\n", GetTickCount() - s_tick);
     MGPlusRestoreHG(hgs, 1);
 }
 
@@ -333,8 +333,7 @@ static HGRAPHICS ResetGraphics(HWND hWnd, HDC* hdc)
     return hgs;
 }
 
-static int
-mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT mGPlusWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static int x_s = 0, y_s = 0;
     switch (message) {

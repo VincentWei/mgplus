@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS=foreign
 
-SUBDIRS = animate src path pen tcldemo glyphoutline colorcomposite
+SUBDIRS = animate src path pen glyphoutline colorcomposite
 
 EXTRA_DIST =
 

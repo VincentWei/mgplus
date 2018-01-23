@@ -16,7 +16,7 @@
 #define ID_MP_GLYPH_REN_AGG_GRAY8            105
 #define ID_MP_GLYPH_REN_METRICS              106
 
-int glyphoutlineProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+LRESULT glyphoutlineProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
     static HGRAPHICS graphics;

@@ -11,7 +11,7 @@
 
 HDC buf_dc;
 
-static void draw_animate (HDC hdc, ANIMATE* ani)
+static void draw_animate (HDC hdc, ANIMATE* ani, void* foo)
 {
     HDC memdc = (HDC)ani->img;
 	SetMemDCAlpha(memdc, MEMDC_FLAG_SRCALPHA, GetAnimateA(ani));
@@ -70,7 +70,7 @@ void StartAlphaAnimate (int interval, int all_times, HDC hdc,
     SetAnimateA(a, start_alpha);
 	InsertAnimate(as, a, FALSE);	
 
-    tl = CreateTimeLine((int)a);
+    tl = CreateTimeLine((DWORD)a);
     TLAlphaTo(tl, a, end_alpha, all_times/interval - 3);
 
     TLRun (tl, all_times/interval - 3);
@@ -85,7 +85,7 @@ typedef struct _alphainfo{
     HDC     buf_dc;
 }ALPHAINFO;
 
-static void draw_animate (HDC hdc, ANIMATE* ani)
+static void draw_animate (HDC hdc, ANIMATE* ani, void* foo)
 {
     HDC bmpdc = (HDC)ani->img;
 	SetMemDCAlpha(bmpdc, MEMDC_FLAG_SRCALPHA, GetAnimateA(ani));
@@ -152,7 +152,7 @@ void StartAlphaAnimate (int interval, int all_times, HDC hdc, const BITMAP* bitm
     SetAnimateA(a, 0);
 	InsertAnimate(as, a, FALSE);	
 
-	tl = CreateTimeLine((int)a);
+	tl = CreateTimeLine((DWORD)a);
 	TLAlphaTo(tl, a, 255, all_times/interval - 3);
     TLRun (tl, all_times/interval - 3);
 	StartTimeLine(as, tl, NULL, 0, NULL);

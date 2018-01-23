@@ -160,7 +160,7 @@ int  fill_lion (HGRAPHICS hgs, HBRUSH brush, HPATH path)
 {
     const char* ptr = g_lion;
     int npaths = 0;
-    ARGB color_current;
+    ARGB color_current = 0;
     BOOL b_first = TRUE;
 
     while(*ptr)
@@ -239,7 +239,7 @@ int  draw_lion (HGRAPHICS hgs, HPEN pen, HPATH path)
 {
     const char* ptr = g_lion;
     int npaths = 0;
-    ARGB color_current;
+    ARGB color_current = 0;
     BOOL b_first = TRUE;
 
     while(*ptr)
@@ -324,8 +324,7 @@ static int g_nStartY = 0;
 static int g_nRotateAngle = 0;
 static float g_fScale = 1;
 
-static int
-mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT mGPlusWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
@@ -609,11 +608,12 @@ mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
                         printf("create graphics failed\n");
                         return 0;
                     }
-                    MPPOINT points [4];
                     HBRUSH hBrush = MGPlusBrushCreate (MP_BRUSH_TYPE_SOLIDCOLOR);
 
                     MGPlusSetSolidBrushColor (hBrush, 0xFFFFFFFF);
 
+#if 0
+                    MPPOINT points [4];
                     points [0].x = 0;
                     points [0].y = 100;
 
@@ -626,6 +626,7 @@ mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
                     points [3].x = 0;
                     points [3].y = 400;
 #endif
+#endif
 
                     LoadBitmap (HDC_SCREEN, &g_stTestBitmap, "./res/gundam.bmp");
 #if 1 
@@ -633,7 +634,7 @@ mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
                     MGPlusGraphicLoadBitmapFromFile (hgs, 1, "./res/gundam.bmp");
                     MGPlusSetInterpolationMode (hgs, MP_INTERPOLATION_MODE_BILINEAR);
                     //MGPlusDrawImageWithPoints (hgs, 1, points, 4);
-                    RECT rect = {80, 50, 180 + 400, 450};
+                    //RECT rect = {80, 50, 180 + 400, 450};
                     //FillBoxWithBitmap (HDC_SCREEN, 0, 0, 640, 480, &g_stTestBitmap);
 
 #if 0
@@ -754,7 +755,7 @@ mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
                     }
                     HPATH path = MGPlusPathCreate (MP_PATH_FILL_MODE_WINDING);
                     HBRUSH brush = MGPlusBrushCreate (MP_BRUSH_TYPE_SOLIDCOLOR);
-                    int n_path;
+                    //int n_path;
 
                     MGPlusRotateWorldTransform (hgs, g_nRotateAngle);
                     MGPlusScaleWorldTransform (hgs, g_fScale, g_fScale);
@@ -763,7 +764,7 @@ mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
                     //n_path = fill_lion (hgs, brush, path);
                     ARGB a = 0xFF505050;
                     HPEN pen = MGPlusPenCreate (1, a);
-                    n_path = fill_lion (hgs, brush, path);
+                    /*n_path = */fill_lion (hgs, brush, path);
                     //n_path = draw_lion (hgs, pen, path);
 
                     if (MGPlusGraphicSave (hgs, hdc, 0, 0, 0, 0, 0, 0) == MP_OK)
