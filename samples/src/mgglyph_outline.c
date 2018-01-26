@@ -206,8 +206,8 @@ void TestDrawGlyphByData(HGRAPHICS hgs, int x, int y, MPGlyphRendering ren)
 }
 
 #endif
-static int
-mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+
+static LRESULT mGPlusWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static int angle = 0;
     switch (message)

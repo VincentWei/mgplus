@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.60)
-AC_INIT(libmgplus, 1.2.5)
+AC_INIT(libmgplus, 1.4.0)
 AC_CONFIG_SRCDIR(src/agg/agg_platform_support.cpp)
 
 dnl Set various version strings
@@ -16,8 +16,8 @@ dnl Set various version strings
 # set _BINARY_AGE and _INTERFACE_AGE to 0.
 #
 MGPLUS_MAJOR_VERSION=1
-MGPLUS_MINOR_VERSION=2
-MGPLUS_MICRO_VERSION=5
+MGPLUS_MINOR_VERSION=4
+MGPLUS_MICRO_VERSION=0
 MGPLUS_INTERFACE_AGE=0
 MGPLUS_BINARY_AGE=0
 MGPLUS_VERSION=$MGPLUS_MAJOR_VERSION.$MGPLUS_MINOR_VERSION.$MGPLUS_MICRO_VERSION
@@ -97,6 +97,7 @@ AC_FUNC_STAT
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([bzero dup2 getcwd memmove memset putenv strchr strdup strerror strstr])
 
+devel_mode="no"
 build_fashion_lfrdr="yes"
 build_colorcomposite_support="yes"
 build_gradientfill_support="yes"
@@ -109,6 +110,10 @@ pixfmt_bgr24_support="yes"
 pixfmt_rgb24_support="yes"
 pixfmt_rgb555_support="yes"
 pixfmt_rgb565_support="yes"
+
+AC_ARG_ENABLE(develmode,
+[  --enable-develmode       developer mode <default=no>],
+devel_mode=$enableval)
 
 AC_ARG_ENABLE(fashionlf,
 [  --enable-fashionlf           build Fashion LFRDR <default=yes>],
@@ -246,22 +251,25 @@ if test "x$build_ft2_support" != "xno"; then
     FT2_LIBS="`freetype-config --libs`"
 fi
 
+if test "x$devel_mode" = "xyes"; then
+    if test "$ac_cv_prog_gcc" = "yes"; then
+        CPPFLAGS="$CPPFLAGS -Wall -Werror"
+    fi
+fi
+
 if test "$ac_cv_prog_gcc" = "yes"; then
-    CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -pipe"
+    CFLAGS="$CFLAGS -Wstrict-prototypes -pipe"
 fi
 
 CPPFLAGS="$CPPFLAGS $FT2_CFLAGS"
-DEP_LIBS="$DEP_LIBS $FT2_LIBS -lstdc++"
+DEP_LIBS="$DEP_LIBS $FT2_LIBS -lpthread -lstdc++"
 
 AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
 
 dnl ========================================================================
-dnl check for run-time mode of MiniGUI
+dnl check the installation of MiniGUI
 dnl ========================================================================
-threads_version="no"
-AC_CHECK_DECLS(_MGRM_THREADS, threads_version="yes", foo=bar, [#include <minigui/common.h>])
-
-PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.0.10])
+PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.2.0])
 
 APP_LIBS="$APP_LIBS -lmgplus$LIB_SUFFIX $MINIGUI_LIBS $DEP_LIBS"
 AC_SUBST(APP_LIBS)

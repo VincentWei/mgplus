@@ -109,8 +109,7 @@ static BITMAP exit_sub_bmp={0};
 static HWND hwnd_menu, hwnd_disk;
 static HWND hsub;
 
-static int
-SubWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT SubWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch(message)
     {

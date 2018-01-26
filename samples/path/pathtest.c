@@ -22,7 +22,7 @@
 
 #define TEST
 
-int PathOddProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+LRESULT PathOddProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HGRAPHICS graphics;
     static HPATH  oddpath, zeropath, oldpathodd, oldpathzero, addpathodd;
@@ -287,7 +287,7 @@ int PathOddProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
 
                 case ID_DrawImageWithPath:
                     {
-                        RECT rect = {50 , 50, 600,600};
+                        //RECT rect = {50 , 50, 600,600};
                         //MGPlusPathAddBezier(oddpath, 11,11, 188, 933, 99, 0, 222,211);
                         //MGPlusPathAddBezier(zeropath, 611,11, 788,933, 699,0, 822,211);
                         MGPlusPathAddRectangle( oddpath, 0, 0, 1024, 765);

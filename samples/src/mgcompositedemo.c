@@ -384,7 +384,7 @@ void CompositeDrawCopy(HWND hDlg)
     EndPaint(hDlg, hdc);
 }
 
-static int DialogBoxProc2 (HWND hDlg, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT DialogBoxProc2 (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static int disp_mode = 3;
     switch (message) {

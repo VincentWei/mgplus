@@ -66,7 +66,7 @@ static CTRLDATA CtrlInputChar [] =
 
 
 static char buffer[24] = "16";
-static int SelectWindProc (HWND hDlg, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT SelectWindProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message) {
         case MSG_CLOSE:
@@ -95,7 +95,7 @@ static void SelectWind (HWND hWnd)
 }
 
 
-int PenProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+LRESULT PenProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
     static COLORDLGDATA pcdd = {0};

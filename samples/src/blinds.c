@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <sys/time.h>
 
 #include <minigui/common.h>
@@ -418,8 +419,7 @@ void BlindsAnimate(HWND hwnd, int interval, int part_num, int frame_num, PBITMAP
 }
 #endif
 
-static int
-BlindDemoWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT BlindDemoWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {

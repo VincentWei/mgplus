@@ -41,7 +41,7 @@
 
 //#define TEST
 
-int BrushProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+LRESULT BrushProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HGRAPHICS  graphics_L, graphics, graphics_T, graphics_H;
     static HPATH  pathodd,pathzero;
@@ -79,7 +79,7 @@ int BrushProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
             pen = MGPlusPenCreate(9, p);
 
             brush_T = MGPlusBrushCreate (MP_BRUSH_TYPE_TEXTUREFILL);
-            //brush_H = MGPlusBrushCreate (MP_BRUSH_TYPE_HATCHFILL);
+            brush_H = MGPlusBrushCreate (MP_BRUSH_TYPE_HATCHFILL);
             brush_S = MGPlusBrushCreate (MP_BRUSH_TYPE_SOLIDCOLOR);
 
             brush_L = MGPlusBrushCreate (MP_BRUSH_TYPE_LINEARGRADIENT);
@@ -293,7 +293,7 @@ int BrushProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
             MGPlusPathDelete(pathzero);
 
             MGPlusBrushDelete (brush_T);
-            //MGPlusBrushDelete (brush_H);
+            MGPlusBrushDelete (brush_H);
             MGPlusBrushDelete (brush_S);
             MGPlusBrushDelete (brush_P);
             MGPlusBrushDelete (brush_L);

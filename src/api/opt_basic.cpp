@@ -364,7 +364,6 @@ draw_path(HDC hdc, Uint8* pixels, int pitch, int bpp, const RECT* rc, void* ctx)
 
     agg::rasterizer_scanline_aa<>   ras;
     agg::scanline_u8                sl;
-    unsigned int i = 0;
 
     PIXFMT_CUSTOM_TYPE      ren_pixf(pctx->gps->rendering_buff);
     RENDERER_CUSTOM_TYPE    ren_comp(ren_pixf);
@@ -436,14 +435,15 @@ draw_path(HDC hdc, Uint8* pixels, int pitch, int bpp, const RECT* rc, void* ctx)
                 stroke_path.line_join (agg::miter_join_round);
                 break;
         }
-        i = 0;
-        while (i < pctx->path->id)
+
+        int n = 0;
+        while (n < pctx->path->id)
         {
-            pctx->path->m_agg_ps.rewind( pctx->path->path_id[i] );
+            pctx->path->m_agg_ps.rewind( pctx->path->path_id[n] );
             agg::conv_transform<agg::path_storage, agg::trans_affine>
                 trans (pctx->path->m_agg_ps, mot);
             RAS_ADD_PATH(pctx->gps, trans);
-            i ++;
+            n ++;
         }
 
         agg::conv_transform<STROKE_DASH_TYPE, agg::trans_affine>
@@ -485,10 +485,11 @@ draw_path(HDC hdc, Uint8* pixels, int pitch, int bpp, const RECT* rc, void* ctx)
                 stroke_path.line_join (agg::miter_join_round);
                 break;
         }
+
         /* add path to rasterizer. */
-        i = 0;
-        while (i < pctx->path->id) {
-            pctx->path->m_agg_ps.rewind( pctx->path->path_id[i] );
+        int n = 0;
+        while (n < pctx->path->id) {
+            pctx->path->m_agg_ps.rewind( pctx->path->path_id[n] );
             agg::conv_transform<agg::path_storage, agg::trans_affine>
                 trans (pctx->path->m_agg_ps, mot);
 
@@ -501,7 +502,7 @@ draw_path(HDC hdc, Uint8* pixels, int pitch, int bpp, const RECT* rc, void* ctx)
             }
 #endif
             RAS_ADD_PATH(pctx->gps, trans);
-            i ++;
+            n ++;
         }
 
         agg::conv_transform<STROKE_STORAGE_TYPE, agg::trans_affine>
@@ -1647,42 +1648,45 @@ draw_glyph(HDC hdc, Uint8* pixels, int pitch, int bpp,
 
     switch (pctx->lpdata->data_type){
         case GLYPH_DATA_MONO:
-            {
-                path_adaptor.init((agg::int8u*)pctx->lpdata->data, 
-                        pctx->lpdata->data_size, pctx->x, pctx->y, 1.0);
+        {
+            path_adaptor.init((agg::int8u*)pctx->lpdata->data, 
+                    pctx->lpdata->data_size, pctx->x, pctx->y, 1.0);
 
-                agg::conv_transform<PATH_ADAPTOR, agg::trans_affine>
-                    trans (path_adaptor, mot);
+            agg::conv_transform<PATH_ADAPTOR, agg::trans_affine>
+                trans (path_adaptor, mot);
 
-                double x, y;
-                unsigned cmd;
-                trans.rewind(0);
-                int i = 0;
-//                agg::int32* p = (agg::int32*)pctx->lpdata->data;
-                while(!((cmd = trans.vertex(&x, &y)) == agg::path_cmd_stop)) {
-                    //path_adaptor.modify_vertex(i, &x, &y, cmd);
-                    i ++;
-                }
+            double x, y;
+            unsigned cmd;
+            trans.rewind(0);
+            int i = 0;
+            while(!((cmd = trans.vertex(&x, &y)) == agg::path_cmd_stop)) {
+                //path_adaptor.modify_vertex(i, &x, &y, cmd);
+                i ++;
             }
+
             agg::render_scanlines_bin_solid(pctx->font->m_fman->mono_adaptor(), 
                     pctx->font->m_fman->mono_scanline(), ren_comp, color);
             break;
+        }
+
         case GLYPH_DATA_GRAY8:
-            {
-                path_adaptor.init((agg::int8u*)pctx->lpdata->data, 
-                        pctx->lpdata->data_size, pctx->x, pctx->y, 1.0);
+        {
+            path_adaptor.init((agg::int8u*)pctx->lpdata->data, 
+                    pctx->lpdata->data_size, pctx->x, pctx->y, 1.0);
 
-                agg::conv_transform<PATH_ADAPTOR, agg::trans_affine>
-                    trans (path_adaptor, mot);
+            agg::conv_transform<PATH_ADAPTOR, agg::trans_affine>
+                trans (path_adaptor, mot);
 
-                double x, y;
-                unsigned cmd;
-                trans.rewind(0);
-                while(!((cmd = trans.vertex(&x, &y)) == agg::path_cmd_stop));
-            }
+            double x, y;
+            unsigned cmd;
+            trans.rewind(0);
+            while (!((cmd = trans.vertex(&x, &y)) == agg::path_cmd_stop));
+
             AGG_RENDER(1, pctx->font->m_fman->gray8_adaptor(), 
                     pctx->font->m_fman->gray8_scanline(), ren_comp, color);
             break;
+        }
+
         case GLYPH_DATA_OUTLINE:
         {
             agg::scanline_u8 sl;
@@ -1702,6 +1706,11 @@ draw_glyph(HDC hdc, Uint8* pixels, int pitch, int bpp,
             AGG_RENDER_CLIP(pctx->gps, 
                     (pctx->gps->text_hints == MP_TEXT_RENDER_HINT_ANTIALIAS_ON),
                     ras, sl, ren_comp, color);
+        }
+
+        default:
+        {
+            _MG_PRINTF ("mGPlus>API: not handled glyph type: %x.\n", pctx->lpdata->data_type);
         }
     }
 }

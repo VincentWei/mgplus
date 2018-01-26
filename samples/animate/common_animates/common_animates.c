@@ -11,7 +11,7 @@
 static ANIMATE_SENCE sence;
 static int interval = 100;
 
-static void def_nothing_drawbkgnd(HDC hdc, RECT* rt, void *param)
+static void def_nothing_drawbkgnd(HDC hdc, const RECT* rt, void *param)
 {
 }
 
@@ -108,9 +108,8 @@ void RunPushPullAnimate(HDC hdc, const RECT *rt,
 
 void RunPushPullBitmapAnimate(HDC hdc, const RECT *rt, PBITMAP bmpPush, PBITMAP bmpPull, int frame_num, BOOL left_to_right)
 {
-	int w,h;
+	int w;
 	w = RECTWP(rt);
-	h = RECTHP(rt);
 	PUSH_PULL_OBJ objs[2] ={
 		{bmpPush,left_to_right?-w:w, 0,0,0},
 		{bmpPull,0, 0, left_to_right?w:-w, 0}
@@ -130,9 +129,8 @@ static void def_move_window(HDC hdc, ANIMATE* a, void* context)
 }
 void RunPushPullWindowAnimate(const RECT *rt, HWND hwndPush, HWND hwndPull, int frame_num, BOOL left_to_right)
 {
-	int w, h;
+	int w;
 	w = RECTWP(rt);
-	h = RECTHP(rt);
 
 	PUSH_PULL_OBJ objs[2] ={
 		{(void*)hwndPush,left_to_right?-w:w, 0, 0,0},
@@ -148,9 +146,7 @@ void RunPushPullWindowAnimate(const RECT *rt, HWND hwndPush, HWND hwndPull, int 
 	};
 
 	RunPushPullAnimate(HDC_SCREEN, rt, objs, 2, &ops, frame_num, NULL);
-
 }
-
 
 static void def_pin_draw_bkgnd(HDC hdc, const RECT* rtbk, void *param)
 {
@@ -203,10 +199,12 @@ void RunPinAnimate(HDC hdc, PBITMAP bmpbk, PBITMAP bmpPin, int x, int y, int x_b
 	memset(&sence, 0, sizeof(sence));
 }
 
+#if 0 /* not used */
 static void on_run_jump_finished(ANIMATE_SENCE* as)
 {
     memset(as, 0, sizeof(ANIMATE_SENCE));
 }
+#endif
 
 void RunJumpWindow(HWND hwnd, int x_begin, int y_begin, int x_end, int y_end, int w, int h, void (*on_finished)(ANIMATE_SENCE* as), void *param)
 {

@@ -303,8 +303,7 @@ static HGRAPHICS ResetGraphics(HWND hWnd, HDC* hdc)
     return hgs;
 }
 
-static int
-mGPlusWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam)
+static LRESULT mGPlusWinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HGRAPHICS hgs = 0;
     static HPEN pen = 0;

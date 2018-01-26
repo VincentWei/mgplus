@@ -1,6 +1,7 @@
 #ifndef P_CODE_H
 #define P_CODE_H
 
+#include <stdint.h>
 
 #define MIN_STACK_SIZE  8 
 #define DEF_STACK_SIZE  1024
@@ -15,17 +16,17 @@ typedef struct _PCODE_METHOD {
 //the p-code execute env
 typedef struct _PCODE_ENV{
 	PCODE_METHOD *main; //main entry
-	unsigned int* stack;
+	intptr_t* stack;
 	int stack_top;
 	int ip; //instruction pointer;
-	unsigned int result; //save the result
+	intptr_t result; //save the result
 	int calldepath;
 	void *param;
 }PCODE_ENV;
 
 //define the user instruction
 // it return the instruction length
-typedef int (* DO_USER_INSTR)(unsigned char* ins, unsigned int** stack, void* param);
+typedef int (* DO_USER_INSTR)(unsigned char* ins, intptr_t** stack, void* param);
 
 typedef struct _PCODE_USER_INSTR_TABLE{
 	DO_USER_INSTR *entries;
@@ -52,7 +53,7 @@ typedef struct _PCODE_METHOD_TABLE{
 	int method_count;
 }PCODE_METHOD_TABLE;
 
-typedef unsigned int (*NATIVE_CALL_BACK)(int *param, int param_count);
+typedef intptr_t (*NATIVE_CALL_BACK)(int *param, int param_count);
 typedef struct _PCODE_NATIVE_METHOD{
 	NATIVE_CALL_BACK native_callback;
 	int argc;
@@ -147,7 +148,7 @@ void DeletePCodeMethod(PCODE_METHOD *pm);
 
 
 //stack operation
-#define PUSH(stack, v)  (*((stack)++) = (unsigned int)(v))
+#define PUSH(stack, v)  (*((stack)++) = (intptr_t)(v))
 #define POP(stack)   (*(--(stack)))
 
 PCODE_METHOD_TABLE * LoadPCodeMethodsFromFile(const char* file, void (*on_load)(PCODE_METHOD*,const char*, void*), void* param);

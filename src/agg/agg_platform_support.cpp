@@ -202,6 +202,9 @@ namespace agg
             m_bpp = 32;
             break;
 #endif
+        default:
+            _MG_PRINTF ("mGPlus>AGG: Not handled pixel format: %x.\n", m_format);
+            break;
         }
     }
 

@@ -242,7 +242,7 @@ MPStatus MGPlusPathGetVertex (HPATH path, int idx, double* x, double* y, int* cm
     MPPath* m_path = (MPPath*) path;
 
     if (idx < 0 || !cmd
-            || idx > m_path->m_agg_ps.total_vertices())
+            || (unsigned)idx > m_path->m_agg_ps.total_vertices())
         return MP_GENERIC_ERROR;
 
     *cmd = m_path->m_agg_ps.vertex(idx, x, y);
@@ -506,12 +506,12 @@ MPStatus MGPlusPathQuadraticto (HPATH path, float x1, float y1, float x2, float 
 
     double d_x [3], d_y[3];
     double d_last_x, d_last_y;
-    unsigned int flag;
+    //unsigned int flag;
 
     if (!m_path->m_agg_ps.total_vertices ())
         return MP_GENERIC_ERROR;
 
-    flag = m_path->m_agg_ps.last_vertex (&d_last_x, &d_last_y);
+    m_path->m_agg_ps.last_vertex (&d_last_x, &d_last_y);
 
     d_x[0] = d_last_x + (2.0 / 3.0) * (x1 - d_last_x);
     d_y[0] = d_last_y + (2.0 / 3.0) * (y1 - d_last_y);
@@ -529,7 +529,7 @@ MPStatus MGPlusPathQuadraticto (HPATH path, float x1, float y1, float x2, float 
     if (!m_path->m_agg_ps.total_vertices ())
         return MP_GENERIC_ERROR;
 
-    flag = m_path->m_agg_ps.last_vertex (&d_last_x, &d_last_y);
+    m_path->m_agg_ps.last_vertex (&d_last_x, &d_last_y);
 
     agg::curve4 bezier;
     bezier.init (d_last_x, d_last_y, d_x[0], d_y[0], \
@@ -554,7 +554,7 @@ MPStatus MGPlusPathBezierto (HPATH path, float x1, float y1, float x2, float y2,
 
     double d_x [3], d_y[3];
     double d_last_x, d_last_y;
-    unsigned int flag;
+    //unsigned int flag;
 
     d_x [0] = (double)x1;
     d_y [0] = (double)y1;
@@ -572,7 +572,7 @@ MPStatus MGPlusPathBezierto (HPATH path, float x1, float y1, float x2, float y2,
     if (!m_path->m_agg_ps.total_vertices ())
         return MP_GENERIC_ERROR;
 
-    flag = m_path->m_agg_ps.last_vertex (&d_last_x, &d_last_y);
+    m_path->m_agg_ps.last_vertex (&d_last_x, &d_last_y);
 
     agg::curve4 bezier;
     bezier.init (d_last_x, d_last_y, d_x[0], d_y[0], \
@@ -588,6 +588,7 @@ MPStatus MGPlusPathBeziertoI (HPATH path, int x1, int y1, int x2, int y2, int x3
 }
 
 
+#if 0
 inline bool almost_equal(float A, float B, int maxUlps = 100)
 {
     if (A==B) return true;
@@ -606,13 +607,49 @@ inline bool almost_equal(float A, float B, int maxUlps = 100)
         return true;
     return false;
 }
-                            
+#else
+union Float_t
+{
+    Float_t (float num = 0.0f) : f(num) {}
+    // Portable extraction of components.
+    bool Negative() const { return (i >> 31) != 0; }
+    int32_t RawMantissa() const { return i & ((1 << 23) - 1); }
+    int32_t RawExponent() const { return (i >> 23) & 0xFF; }
+
+    int32_t i;
+    float f;
+};
+
+inline bool almost_equal (float A, float B, int maxUlpsDiff = 100)
+{
+    Float_t uA(A);
+    Float_t uB(B);
+
+    // Different signs means they do not match.
+    if (uA.Negative() != uB.Negative()) {
+        // Check for equality to make sure +0==-0
+        if (A == B)
+            return true;
+        return false;
+    }
+
+    // Find the difference in ULPs.
+    int ulpsDiff = abs(uA.i - uB.i);
+    if (ulpsDiff <= maxUlpsDiff)
+        return true;
+
+    return false;
+}
+#endif
 
 MPStatus MGPlusPathArcto (HPATH path, double x1, double y1, double x2, double y2, double radius)
 {
     double x0, y0;
     MPPath* m_path = (MPPath*) path;
-    m_path->m_agg_ps.last_vertex(&x0, &y0);
+
+    if (m_path->m_agg_ps.last_vertex(&x0, &y0) == agg::path_cmd_stop) {
+        return MP_INVALID_PARAMETER;
+    }
     m_path->matrix.inverse_transform(&x0, &y0);
 
     agg::trans_affine_translation xform(-x1, -y1);
@@ -626,12 +663,11 @@ MPStatus MGPlusPathArcto (HPATH path, double x1, double y1, double x2, double y2
     xform.transform(&x2, &y2);
     xform.transform(&x1, &y1);
 
-    double cx, cy;  // location of circle's center
     double center_angle = atan2(y2, x2) / 2;
     bool sweep_flag = (center_angle >= 0) ? false : true;
     double hypotenuse = fabs(radius / sin(center_angle));
-    cx = hypotenuse * cos(center_angle);
-    cy = hypotenuse * sin(center_angle);
+    double cx = hypotenuse * cos(center_angle);
+    /// double cy = hypotenuse * sin(center_angle);
 
     if (!almost_equal(x0, cx))
     {

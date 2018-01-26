@@ -729,7 +729,7 @@ namespace agg
         template<class VertexSource> 
         void concat_path(VertexSource& vs, unsigned path_id = 0)
         {
-            double x, y;
+            double x = 0.0f, y = 0.0f;
             unsigned cmd;
             vs.rewind(path_id);
             while(!is_stop(cmd = vs.vertex(&x, &y)))
