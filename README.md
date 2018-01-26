@@ -3,12 +3,11 @@
 mGPlus - A MiniGUI component which provides support for advanced 2D graphics 
 functions like path, gradient, anti-aliase stretch, and color combination.
 
-This is the mainline release of mGPlus V1.2.x for MiniGUI V3.0.x or later.
+This is the mainline release of mGPlus V1.4.x for MiniGUI V3.2.x or later.
 
 ## Prerequisites
 
-    * MiniGUI: v3.0.10 or later
-    * mGUtils: v1.0.0 or later
+    * MiniGUI: v3.2.0 or later
     * Freetype (optional): v6.2.0 or later
 
 ## Building
@@ -34,5 +33,5 @@ the samples:
 
 ## Copying
 
-Copyright (C) 2008 ~ 2017, Beijing FMSoft Technologies Co., Ltd.
+Copyright (C) 2008 ~ 2018, Beijing FMSoft Technologies Co., Ltd.
 
