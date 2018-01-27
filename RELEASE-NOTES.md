@@ -18,7 +18,7 @@ apps, and report any bugs and incompatibilities to:
 
 ### API changes
 
-    (none).
+The function `MGPlusGetGraphicDC` returns now `HDC_INVALID` on failure.
 
 ## Version 1.2.5
 

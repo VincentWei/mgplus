@@ -36,22 +36,22 @@ extern "C" {
 #include <minigui/fixedmath.h>
 
 #ifndef MGPLUS_MAJOR_VERSION
-#  ifdef __MGPLUS_LIB__
-#    if defined(__CMAKE_PROJECT__) || defined(WIN32)
-#      include "mgplusconfig.h"
-#    else
-#      include "../mgplusconfig.h"
-#    endif
-#  else
-#    include "mgplusconfig.h"
-#    undef PACKAGE
-#    undef VERSION
-#    undef PACKAGE_BUGREPORT
-#    undef PACKAGE_NAME
-#    undef PACKAGE_STRING
-#    undef PACKAGE_TARNAME
-#    undef PACKAGE_VERSION
-#  endif
+#   undef PACKAGE
+#   undef VERSION
+#   undef PACKAGE_BUGREPORT
+#   undef PACKAGE_NAME
+#   undef PACKAGE_STRING
+#   undef PACKAGE_TARNAME
+#   undef PACKAGE_VERSION
+#   ifdef __MGPLUS_LIB__
+#       if defined(__CMAKE_PROJECT__) || defined(WIN32)
+#           include "mgplusconfig.h"
+#       else
+#           include "../mgplusconfig.h"
+#       endif
+#   else
+#       include "mgplusconfig.h"
+#   endif
 #endif
 
 #if defined (WIN32) && !defined(__NODLL__)
