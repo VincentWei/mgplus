@@ -252,9 +252,12 @@ if test "x$build_ft2_support" != "xno"; then
 fi
 
 if test "x$devel_mode" = "xyes"; then
+    CPPFLAGS="$CPPFLAGS -D_DEBUG"
     if test "$ac_cv_prog_gcc" = "yes"; then
         CPPFLAGS="$CPPFLAGS -Wall -Werror"
     fi
+else
+    CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
 
 if test "$ac_cv_prog_gcc" = "yes"; then
@@ -262,7 +265,7 @@ if test "$ac_cv_prog_gcc" = "yes"; then
 fi
 
 CPPFLAGS="$CPPFLAGS $FT2_CFLAGS"
-DEP_LIBS="$DEP_LIBS $FT2_LIBS -lpthread -lstdc++"
+DEP_LIBS="$DEP_LIBS $MINIGUI_LIBS $FT2_LIBS -lpthread -lstdc++"
 
 AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
 
@@ -271,7 +274,7 @@ dnl check the installation of MiniGUI
 dnl ========================================================================
 PKG_CHECK_MODULES([MINIGUI], [minigui >= 3.2.0])
 
-APP_LIBS="$APP_LIBS -lmgplus$LIB_SUFFIX $MINIGUI_LIBS $DEP_LIBS"
+APP_LIBS="$APP_LIBS -lmgplus$LIB_SUFFIX $DEP_LIBS"
 AC_SUBST(APP_LIBS)
 AC_SUBST(DEP_LIBS)
 
