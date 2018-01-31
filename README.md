@@ -7,8 +7,8 @@ This is the mainline release of mGPlus V1.4.x for MiniGUI V3.2.x or later.
 
 ## Prerequisites
 
-    * MiniGUI: v3.2.0 or later
-    * Freetype (optional): v6.2.0 or later
+  * MiniGUI: v3.2.0 or later
+  * Freetype (optional): v6.2.0 or later
 
 ## Building
 
