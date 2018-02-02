@@ -1,6 +1,6 @@
 /*    
 ** a widget of button .
-** Copyright (C) 2002~2009  Feynman Software
+** Copyright (C) 2002~2009  FMSoft
 ** Current maintainer: Tangjianbin.
 
 ** This program is free software; you can redistribute it and/or modify
