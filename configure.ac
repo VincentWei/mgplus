@@ -98,6 +98,7 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([bzero dup2 getcwd memmove memset putenv strchr strdup strerror strstr])
 
 devel_mode="no"
+detail_debug="no"
 build_fashion_lfrdr="yes"
 build_colorcomposite_support="yes"
 build_gradientfill_support="yes"
@@ -114,6 +115,10 @@ pixfmt_rgb565_support="yes"
 AC_ARG_ENABLE(develmode,
 [  --enable-develmode       developer mode <default=no>],
 devel_mode=$enableval)
+
+AC_ARG_ENABLE(detail_debug,
+[  --enable-detaildebug     detailed debug information <default=no>],
+detail_debug=$enableval)
 
 AC_ARG_ENABLE(fashionlf,
 [  --enable-fashionlf           build Fashion LFRDR <default=yes>],
@@ -252,7 +257,11 @@ if test "x$build_ft2_support" != "xno"; then
 fi
 
 if test "x$devel_mode" = "xyes"; then
-    CPPFLAGS="$CPPFLAGS -DDEBUG -D_DEBUG"
+    CPPFLAGS="$CPPFLAGS -D_DEBUG"
+    if test "x$detail_debug" = "xyes"; then
+        CPPFLAGS="$CPPFLAGS -DDEBUG"
+    fi
+
     if test "$ac_cv_prog_gcc" = "yes"; then
         CPPFLAGS="$CPPFLAGS -Wall -Werror"
     fi
