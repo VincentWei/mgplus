@@ -48,7 +48,7 @@ agg_conv_concat.h agg_path_storage_integer.h agg_shorten_path.h agg_vcgen_dash.h
 agg_conv_contour.h agg_pattern_filters_rgba.h agg_simul_eq.h agg_vcgen_markers_term.h\
 agg_conv_curve.h agg_pixfmt_amask_adaptor.h agg_span_allocator.h agg_vcgen_smooth_poly1.h\
 agg_conv_dash.h agg_pixfmt_gray.h agg_span_converter.h agg_vcgen_stroke.h\
-agg_conv_gpc.h agg_pixfmt_rgba.h agg_span_gouraud_gray.h agg_vcgen_vertex_sequence.h\
+agg_pixfmt_rgba.h agg_span_gouraud_gray.h agg_vcgen_vertex_sequence.h\
 agg_conv_marker_adaptor.h agg_pixfmt_rgb.h agg_span_gouraud.h agg_vertex_sequence.h\
 agg_conv_marker.h agg_pixfmt_rgb_packed.h agg_span_gouraud_rgba.h agg_vpgen_clip_polygon.h\
 agg_conv_segmentator.h agg_pixfmt_transposer.h agg_span_gradient_alpha.h agg_vpgen_clip_polyline.h\

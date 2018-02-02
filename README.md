@@ -43,16 +43,31 @@ For more information, please run
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Or,
 
-    As this program is a library, any link to this program must follow
-    GNU General Public License version 3 (GPLv3). If you cannot accept
-    GPLv3, you need to be licensed from FMSoft.
+## AGG Copying
 
-    If you have got a commercial license of this program, please use it
-    under the terms and conditions of the commercial license.
+Note that mPlus uses AGG (Anti-Grain Geometry) V2.5 as the software 
+vectorial graphics engien. Following is the license of AGG V2.5:
 
-    For more information about the commercial license, please refer to
-    <http://www.minigui.com/en/about/licensing-policy/>.
-
+    Anti-Grain Geometry (AGG) - Version 2.5
+    A high quality rendering engine for C++
+    Copyright (C) 2002-2006 Maxim Shemanarev
+    Contact: mcseem@antigrain.com
+            mcseemagg@yahoo.com
+            http://antigrain.com
+ 
+    AGG is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+ 
+    AGG is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU General Public License
+    along with AGG; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+    MA 02110-1301, USA.
 
