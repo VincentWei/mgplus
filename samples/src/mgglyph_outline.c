@@ -32,7 +32,7 @@ void TestDrawGlyphByOutlineCNText(HGRAPHICS hgs, int x, int y, int angle)
     }
 
     for (i = 0; i < strlen(text); i += 2) {
-        unsigned short glyph_code = MAKEWORD(text[i+1], text[i]);
+        unsigned short glyph_code = MAKEWORD16(text[i+1], text[i]);
         if (MGPlusGetGlyphOutline (hfont, glyph_code, 
                     &metrics, &glyph_data) != MP_OK)
         {
@@ -149,7 +149,7 @@ void TestDrawGlyphByDataCNText(HGRAPHICS hgs, int x, int y, int angle, MPGlyphRe
     }
 
     for (i = 0; i < strlen(text); i += 2) {
-        unsigned short glyph_code = MAKEWORD(text[i+1], text[i]);
+        unsigned short glyph_code = MAKEWORD16(text[i+1], text[i]);
         if (MGPlusGetGlyphOutline (hfont, glyph_code, 
                     &metrics, &glyph_data) != MP_OK)
         {
