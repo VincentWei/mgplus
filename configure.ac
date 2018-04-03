@@ -297,18 +297,5 @@ AC_OUTPUT([
         src/Makefile
         src/agg/Makefile
         src/api/Makefile
-        samples/Makefile
-        samples/animate/Makefile
-        samples/animate/common_animates/Makefile
-        samples/src/Makefile
-        samples/src/res/Makefile
-        samples/pen/Makefile 
-        samples/path/Makefile 
-        samples/brush/Makefile 
-        samples/colorcomposite/Makefile 
-        samples/tcldemo/Makefile 
-        samples/tcldemo/res/Makefile 
-        samples/glyphoutline/Makefile 
-        samples/worldtransform/Makefile 
 ])
 
