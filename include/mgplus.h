@@ -2947,7 +2947,7 @@ MGPLUS_EXPORT MPStatus MGPlusSetLinearGradientBrushColorsEx (HBRUSH brush,
 
 
 /**
- * \fn MGPlusLinearGradientBrushGetColors (HBRUSH brush, ARGB* color, float* position))
+ * \fn MPStatus MGPlusLinearGradientBrushGetColors (HBRUSH brush, ARGB* color, float* position)
  *
  * \brief get the linear gradient brush color.
  *
