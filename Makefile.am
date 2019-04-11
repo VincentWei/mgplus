@@ -12,3 +12,6 @@ EXTRA_DIST = README.md RELEASE-NOTES.md INSTALL autogen.sh
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = mgplus.pc
+
+docs:
+	doxygen Doxyfile

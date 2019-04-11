@@ -1,6 +1,6 @@
 # mGPlus
 
-mGPlus - A MiniGUI component which provides support for advanced 2D graphics 
+mGPlus - A MiniGUI component which provides support for advanced 2D graphics
 functions like path, gradient, anti-aliase stretch, and color combination.
 
 This is the mainline release of mGPlus V1.4.x for MiniGUI V3.2.x or later.
@@ -58,8 +58,8 @@ For more information, please run
 
 ## AGG Copying
 
-Note that mPlus uses AGG (Anti-Grain Geometry) V2.5 as the software 
-vectorial graphics engien. Following is the license of AGG V2.5:
+Note that mPlus uses AGG (Anti-Grain Geometry) V2.5 as the software
+vector graphics engien. Following is the license of AGG V2.5:
 
     Anti-Grain Geometry (AGG) - Version 2.5
     A high quality rendering engine for C++
@@ -67,19 +67,19 @@ vectorial graphics engien. Following is the license of AGG V2.5:
     Contact: mcseem@antigrain.com
             mcseemagg@yahoo.com
             http://antigrain.com
- 
+
     AGG is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
     as published by the Free Software Foundation; either version 2
     of the License, or (at your option) any later version.
- 
+
     AGG is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
- 
+
     You should have received a copy of the GNU General Public License
     along with AGG; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
     MA 02110-1301, USA.
 
