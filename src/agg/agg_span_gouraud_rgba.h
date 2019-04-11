@@ -207,17 +207,21 @@ namespace agg
                 vg = g.y();
                 vb = b.y();
                 va = a.y();
-                if(vr < 0) vr = 0; if(vr > lim) vr = lim;
-                if(vg < 0) vg = 0; if(vg > lim) vg = lim;
-                if(vb < 0) vb = 0; if(vb > lim) vb = lim;
-                if(va < 0) va = 0; if(va > lim) va = lim;
+                if(vr < 0) vr = 0;
+                if(vr > lim) vr = lim;
+                if(vg < 0) vg = 0;
+                if(vg > lim) vg = lim;
+                if(vb < 0) vb = 0;
+                if(vb > lim) vb = lim;
+                if(va < 0) va = 0;
+                if(va > lim) va = lim;
                 span->r = (value_type)vr;
                 span->g = (value_type)vg;
                 span->b = (value_type)vb;
                 span->a = (value_type)va;
-                r     += subpixel_scale; 
-                g     += subpixel_scale; 
-                b     += subpixel_scale; 
+                r     += subpixel_scale;
+                g     += subpixel_scale;
+                b     += subpixel_scale;
                 a     += subpixel_scale;
                 nlen  -= subpixel_scale;
                 start -= subpixel_scale;
@@ -254,10 +258,14 @@ namespace agg
                 vg = g.y();
                 vb = b.y();
                 va = a.y();
-                if(vr < 0) vr = 0; if(vr > lim) vr = lim;
-                if(vg < 0) vg = 0; if(vg > lim) vg = lim;
-                if(vb < 0) vb = 0; if(vb > lim) vb = lim;
-                if(va < 0) va = 0; if(va > lim) va = lim;
+                if(vr < 0) vr = 0;
+                if(vr > lim) vr = lim;
+                if(vg < 0) vg = 0;
+                if(vg > lim) vg = lim;
+                if(vb < 0) vb = 0;
+                if(vb > lim) vb = lim;
+                if(va < 0) va = 0;
+                if(va > lim) va = lim;
                 span->r = (value_type)vr;
                 span->g = (value_type)vg;
                 span->b = (value_type)vb;
@@ -278,9 +286,6 @@ namespace agg
         rgba_calc m_rgba2;
         rgba_calc m_rgba3;
     };
-
-
-
 }
 
 #endif
