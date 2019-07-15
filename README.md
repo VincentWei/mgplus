@@ -28,58 +28,74 @@ For more information, please run
 
 ## Copying
 
-    Copyright (C) 2008~2018, Beijing FMSoft Technologies Co., Ltd.
+Copyright (C) 2008 ~ 2018, Beijing FMSoft Technologies Co., Ltd.
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Or,
+Or,
 
-    As this program is a library, any link to this program must follow
-    GNU General Public License version 3 (GPLv3). If you cannot accept
-    GPLv3, you need to be licensed from FMSoft.
+As this program is a library, any link to this program must follow
+GNU General Public License version 3 (GPLv3). If you cannot accept
+GPLv3, you need to be licensed from FMSoft.
 
-    If you have got a commercial license of this program, please use it
-    under the terms and conditions of the commercial license.
+If you have got a commercial license of this program, please use it
+under the terms and conditions of the commercial license.
 
-    For more information about the commercial license, please refer to
-    <http://www.minigui.com/en/about/licensing-policy/>.
+For more information about the commercial license, please refer to
+<http://www.minigui.com/en/about/licensing-policy/>.
 
+### Special Statement
 
-## AGG Copying
+The above open source or free software license does
+not apply to any entity in the Exception List published by
+Beijing FMSoft Technologies Co., Ltd.
 
-Note that mPlus uses AGG (Anti-Grain Geometry) V2.5 as the software 
+If you are or the entity you represent is listed in the Exception List,
+the above open source or free software license does not apply to you
+or the entity you represent. Regardless of the purpose, you should not
+use the software in any way whatsoever, including but not limited to
+downloading, viewing, copying, distributing, compiling, and running.
+If you have already downloaded it, you MUST destroy all of its copies.
+
+The Exception List is published by FMSoft and may be updated
+from time to time. For more information, please see
+<https://www.fmsoft.cn/exception-list>.
+
+### AGG Copying
+
+Note that mPlus uses AGG (Anti-Grain Geometry) V2.5 as the software
 vectorial graphics engien. Following is the license of AGG V2.5:
 
-    Anti-Grain Geometry (AGG) - Version 2.5
-    A high quality rendering engine for C++
-    Copyright (C) 2002-2006 Maxim Shemanarev
-    Contact: mcseem@antigrain.com
-            mcseemagg@yahoo.com
-            http://antigrain.com
- 
-    AGG is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
- 
-    AGG is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
- 
-    You should have received a copy of the GNU General Public License
-    along with AGG; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
-    MA 02110-1301, USA.
+Anti-Grain Geometry (AGG) - Version 2.5
+A high quality rendering engine for C++
+Copyright (C) 2002-2006 Maxim Shemanarev
+Contact: mcseem@antigrain.com
+        mcseemagg@yahoo.com
+        http://antigrain.com
+
+AGG is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+AGG is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with AGG; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+MA 02110-1301, USA.
 
