@@ -60,11 +60,11 @@ For more information about the commercial license, please refer to
 Note that mPlus uses AGG (Anti-Grain Geometry) V2.5 as the software
 vector graphics engien. Following is the license of AGG V2.5:
 
-Anti-Grain Geometry (AGG) - Version 2.5
-A high quality rendering engine for C++
-Copyright (C) 2002-2006 Maxim Shemanarev
-Contact: mcseem@antigrain.com
-        mcseemagg@yahoo.com
+Anti-Grain Geometry (AGG) - Version 2.5  
+A high quality rendering engine for C++  
+Copyright (C) 2002-2006 Maxim Shemanarev  
+Contact: mcseem@antigrain.com  
+        mcseemagg@yahoo.com  
         http://antigrain.com
 
 AGG is free software; you can redistribute it and/or
