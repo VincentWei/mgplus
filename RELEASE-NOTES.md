@@ -1,5 +1,21 @@
 # Release Notes
 
+## Version 1.4.1
+
+The MiniGUI development team announces the availability of mGPlus 1.4.1.
+
+All users of MiniGUI are encouraged to use this version with your new MiniGUI
+apps, and report any bugs and incompatibilities to:
+
+    https://github.com/VincentWei/mgplus
+
+### What's new in this version
+
+This version mainly fixed some minor issues:
+
+- Tune some API description.
+- Tune format string for `size_t` values.
+
 ## Version 1.4.0
 
 The MiniGUI development team announces the availability of mGPlus 1.4.0,
@@ -12,7 +28,7 @@ apps, and report any bugs and incompatibilities to:
 
 ### What's new in this version
 
- * Tune code to comply with MiniGUI 3.2.x. 
+ * Tune code to comply with MiniGUI 3.2.x.
  * Tune code for 64-bit platform.
  * Tune code to eliminate all warnings.
 
@@ -25,12 +41,12 @@ The function `MGPlusGetGraphicDC` returns now `HDC_INVALID` on failure.
 The MiniGUI development team announces the availability of mGPlus 1.2.5 RC1.
 This release is the first Release Candidate for 1.2.5. All users of MiniGUI are
 encouraged to test this version carefully, and report any bugs and incompatibilities
-in [the bug tracking system](http://bugs.minigui.org) (see soon). 
+in [the bug tracking system](http://bugs.minigui.org) (see soon).
 
 ### What's new in this version
 
  * The autoconf/automake config scripts are cleaned up.
- * Fix some bugs. 
+ * Fix some bugs.
 
 ### API changes
 
