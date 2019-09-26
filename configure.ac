@@ -252,8 +252,8 @@ if test "x$build_ft2_support" != "xno"; then
         foo=bar,
         build_ft2_support=no)
 
-    FT2_CFLAGS="`freetype-config --cflags`"
-    FT2_LIBS="`freetype-config --libs`"
+    FT2_CFLAGS="`pkg-config freetype2 --cflags`"
+    FT2_LIBS="`pkg-config freetype2 --libs`"
 fi
 
 if test "x$devel_mode" = "xyes"; then
