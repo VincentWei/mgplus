@@ -1,0 +1,20 @@
+#!/bin/sh
+
+RTEMS_DIR=/home/projects/movidius/m8_gui/tools/18.11.4/linux64/sparc-myriad-rtems-6.3.0
+
+#RTEMS_GLOBAL_CFLAGS="-ffunction-sections -fdata-sections -fno-rtti -fno-exceptions -finit-priority"
+
+MINIGUI_CFLAGS="-I${RTEMS_DIR}/minigui/include"
+MINIGUI_LIBS=libminigui_ths.a
+
+rm -f config.cache config.status
+
+CXX=${RTEMS_DIR}/bin/sparc-myriad-rtems-g++ \
+CFLAGS="-I${RTEMS_DIR}/sparc-myriad-rtems/include -I${RTEMS_DIR}/pnglib/include -I${RTEMS_DIR}/zlib/include -I${RTEMS_DIR}/pnglib/include -I${RTEMS_DIR}/minigui/include" \
+LDFLAGS="-L${RTEMS_DIR}/lib/gcc/sparc-myriad-rtems/6.3.0 -L${RTEMS_DIR}/pnglib/lib -L${RTEMS_DIR}/zlib/lib -L${RTEMS_DIR}/pnglib/lib -L${RTEMS_DIR}/minigui/lib" \
+CXXFLAGS="-I${RTEMS_DIR}/sparc-myriad-rtems/include -I${RTEMS_DIR}/pnglib/include -I${RTEMS_DIR}/zlib/include -I${RTEMS_DIR}/pnglib/include -I${RTEMS_DIR}/minigui/include" \
+./configure --prefix=/home/projects/movidius/m8_gui/tools/18.11.4/linux64/sparc-myriad-rtems-6.3.0/mgplus \
+    --build=i686-linux \
+    --host=sparc-myriad-rtems \
+    --target=sparc-myriad-rtems \
+    --enable-static 
