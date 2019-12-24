@@ -58,12 +58,6 @@
  */
 
 
-/*! \mainpage mGPlus V1.2.4 API Reference
- *
- * \section mainpage Introduction
- *
- */
-
 #ifndef _MGPLUS_H
 #define _MGPLUS_H
 

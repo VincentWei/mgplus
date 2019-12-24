@@ -1,5 +1,20 @@
 # Release Notes
 
+## Version 1.4.2
+
+The MiniGUI development team announces the availability of mGPlus 1.4.2.
+
+All users of MiniGUI are encouraged to use this version with your new MiniGUI
+apps, and report any bugs and incompatibilities to:
+
+    https://github.com/VincentWei/mgplus
+
+### What's new in this version
+
+This version mainly fixed some minor issues:
+
+- Remove some bad API description instructions.
+
 ## Version 1.4.1
 
 The MiniGUI development team announces the availability of mGPlus 1.4.1.
