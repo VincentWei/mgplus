@@ -101,7 +101,7 @@ static void inline get_rad_target (int x0, int y0, int x1, int y1,
 static void draw_bkgnd (HDC hdc, const RECT* rc, void* param)
 {
     SetBrushType (hdc, BT_SOLID);
-    SetBrushColor (hdc, COLOR_black);
+    SetBrushColor (hdc, PIXEL_black);
     FillBox (hdc, rc->left, rc->top, RECTWP(rc), RECTHP(rc));
 }
 
@@ -276,7 +276,7 @@ int MiniGUIMain (int argc, const char* argv[])
     CreateInfo.ty = 0;
     CreateInfo.rx = 0;
     CreateInfo.by = 0;
-    CreateInfo.iBkColor = COLOR_lightwhite;
+    CreateInfo.iBkColor = PIXEL_lightwhite;
     CreateInfo.dwAddData = 0;
     CreateInfo.hHosting = HWND_DESKTOP;
 

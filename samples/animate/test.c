@@ -165,7 +165,7 @@ mono_animate (anim, 10, 50);
     CreateInfo.ty = 0;
     CreateInfo.rx = g_rcScr.right;
     CreateInfo.by = g_rcScr.bottom;
-    CreateInfo.iBkColor = COLOR_green;
+    CreateInfo.iBkColor = PIXEL_green;
     CreateInfo.dwAddData = 0;
     CreateInfo.hHosting = HWND_DESKTOP;
 

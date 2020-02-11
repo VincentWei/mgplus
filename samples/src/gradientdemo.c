@@ -941,7 +941,7 @@ MiniGUIMain(int argc, const char *argv[])
     CreateInfo.ty = 0;
     CreateInfo.rx = g_rcScr.right;
     CreateInfo.by = g_rcScr.bottom;
-    CreateInfo.iBkColor = COLOR_lightwhite;
+    CreateInfo.iBkColor = PIXEL_lightwhite;
     CreateInfo.dwAddData = 0;
     CreateInfo.hHosting = HWND_DESKTOP;
 

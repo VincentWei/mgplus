@@ -418,7 +418,7 @@ static LRESULT DialogBoxProc2 (HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
     static int disp_mode = 3;
     switch (message) {
         case MSG_INITDIALOG:
-            SetWindowBkColor(hDlg, COLOR_lightwhite);
+            SetWindowBkColor(hDlg, PIXEL_lightwhite);
             return 1;
         case MSG_KEYUP:
         {

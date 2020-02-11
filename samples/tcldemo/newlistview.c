@@ -609,7 +609,7 @@ BOOL RegisterNewlistview(void)
     MyClass.dwStyle     = WS_NONE;
     MyClass.dwExStyle   = WS_EX_NONE;
     MyClass.hCursor     = GetSystemCursor (IDC_ARROW);
-    MyClass.iBkColor    = COLOR_black;
+    MyClass.iBkColor    = PIXEL_black;
     MyClass.WinProc     = NewlistviewProc;
     return RegisterWindowClass (&MyClass);
 }

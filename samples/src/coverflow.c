@@ -1615,7 +1615,7 @@ int MiniGUIMain(int argc, const char *argv[])
     CreateInfo.ty = 0;
     CreateInfo.rx = SCREEN_WIDTH;
     CreateInfo.by = SCREEN_HEIGHT;
-    CreateInfo.iBkColor = COLOR_black;
+    CreateInfo.iBkColor = PIXEL_black;
     CreateInfo.dwAddData = 0;
     CreateInfo.hHosting = HWND_DESKTOP;
 

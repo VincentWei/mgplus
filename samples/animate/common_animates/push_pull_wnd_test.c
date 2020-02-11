@@ -61,8 +61,8 @@ int MiniGUIMain (int argc, const char* argv[])
     JoinLayer(NAME_DEF_LAYER , "helloworld" , 0 , 0);
 #endif
 
-	hwndPull = CreateTestDemoProc(COLOR_black);
-	hwndPush = CreateTestDemoProc(COLOR_lightwhite);
+	hwndPull = CreateTestDemoProc(PIXEL_black);
+	hwndPush = CreateTestDemoProc(PIXEL_lightwhite);
 
 	getchar();
 
