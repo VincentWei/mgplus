@@ -1,5 +1,18 @@
 # Release Notes
 
+## Version 1.5.0
+
+The MiniGUI development team announces the availability of mGPlus 1.5.0.
+
+All users of MiniGUI are encouraged to use this version with your new MiniGUI
+apps, and report any bugs and incompatibilities to:
+
+    https://github.com/VincentWei/mgplus/tree/dev-4-1
+
+### What's new in this version
+
+- Tune code for MiniGUI 5.0.0 or later.
+
 ## Version 1.4.2
 
 The MiniGUI development team announces the availability of mGPlus 1.4.2.
