@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.60)
-AC_INIT(libmgplus, 1.4.2)
+AC_INIT(libmgplus, 1.5.0)
 AC_CONFIG_SRCDIR(src/agg/agg_platform_support.cpp)
 
 dnl Set various version strings
@@ -16,10 +16,10 @@ dnl Set various version strings
 # set _BINARY_AGE and _INTERFACE_AGE to 0.
 #
 MGPLUS_MAJOR_VERSION=1
-MGPLUS_MINOR_VERSION=4
-MGPLUS_MICRO_VERSION=2
-MGPLUS_INTERFACE_AGE=2
-MGPLUS_BINARY_AGE=2
+MGPLUS_MINOR_VERSION=5
+MGPLUS_MICRO_VERSION=0
+MGPLUS_INTERFACE_AGE=0
+MGPLUS_BINARY_AGE=0
 MGPLUS_VERSION=$MGPLUS_MAJOR_VERSION.$MGPLUS_MINOR_VERSION.$MGPLUS_MICRO_VERSION
 
 AC_SUBST(MGPLUS_MAJOR_VERSION)

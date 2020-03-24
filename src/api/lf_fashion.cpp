@@ -243,7 +243,7 @@ static inline void erase_bkgnd (HWND hWnd, HDC hdc, const RECT *rect)
         old_color = SetBrushColor (hdc, GetWindowBkColor (hWnd));
     else
         old_color = SetBrushColor (hdc, 
-                GetWindowElementPixel (HWND_DESKTOP, WE_BGC_DESKTOP));
+                GetWindowElementPixelEx (HWND_DESKTOP, hdc, WE_BGC_DESKTOP));
 
     FillBox (hdc, rect->left, rect->top, RECTWP(rect), RECTHP(rect));
     SetBrushColor (hdc, old_color);
@@ -2563,10 +2563,10 @@ static int hit_test (HWND hWnd, int x, int y)
     win_h = win_info->bottom - win_info->top;
 
     /*mouse not in this window*/
-    CHECK_RET_VAL(!PtInRect((RECT*)win_info, x, y), HT_OUT);
+    CHECK_RET_VAL(!PtInRect((RECT*)&win_info->left, x, y), HT_OUT);
 
     /*mouse in client area*/
-    CHECK_RET_VAL(PtInRect((RECT*)&(win_info->cl), x, y), HT_CLIENT);
+    CHECK_RET_VAL(PtInRect((RECT*)&win_info->cl, x, y), HT_CLIENT);
 
     /*change x y to hwnd coordiante*/
     x -= win_info->left;
@@ -4235,7 +4235,7 @@ draw_trackbar (HWND hWnd, HDC hdc, LFRDR_TRACKBARINFO *info)
     /* draw the tick of trackbar. */
     if (!(dwStyle & TBS_NOTICK)) {
         SetPenColor(hdc_graphic, 
-                GetWindowElementPixel(hWnd, WE_FGC_THREED_BODY));
+                GetWindowElementPixelEx (hWnd, hdc_graphic, WE_FGC_THREED_BODY));
         if (dwStyle & TBS_VERTICAL) {
             TickStart = y + (HEIGHT_VERT_SLIDER >> 1); 
             TickGap = itofix(h - HEIGHT_VERT_SLIDER);
@@ -4580,7 +4580,7 @@ draw_progress (HWND hWnd, HDC hdc,
     x += ((w - text_ext.cx) >> 1) + 1;
     y += ((h - text_ext.cy) >> 1);
 
-    graphic_pixel = GetWindowElementPixel(hWnd, WE_BGCB_ACTIVE_CAPTION);
+    graphic_pixel = GetWindowElementPixelEx (hWnd, hdc_graphic, WE_BGCB_ACTIVE_CAPTION);
 
     SetTextColor (hdc_graphic,
             DWORD2Pixel (hdc_graphic,
