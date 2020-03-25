@@ -7,7 +7,7 @@ The MiniGUI development team announces the availability of mGPlus 1.5.0.
 All users of MiniGUI are encouraged to use this version with your new MiniGUI
 apps, and report any bugs and incompatibilities to:
 
-    https://github.com/VincentWei/mgplus/tree/dev-4-1
+<https://github.com/VincentWei/mgplus/tree/rel-5-0>
 
 ### What's new in this version
 
