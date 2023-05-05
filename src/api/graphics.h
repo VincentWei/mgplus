@@ -46,7 +46,7 @@
  ** Create date: 2008/12/02
  */
 #ifndef MGPLUS_GRAHPICS_H
-#define MGPLUS_GRAPHICS_H
+#define MGPLUS_GRAHPICS_H
 
 #include "agg_rendering_buffer.h"
 #include "agg_rasterizer_scanline_aa.h"
