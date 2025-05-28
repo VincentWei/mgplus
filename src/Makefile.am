@@ -2,11 +2,10 @@ TOP_DIR=..
 AM_CPPFLAGS = -I$(TOP_DIR)/include
 
 COMMON_SUBDIRS = agg api
-DIST_SUBDIRS = $(COMMON_SUBDIRS) 
+DIST_SUBDIRS = $(COMMON_SUBDIRS)
 SUBDIRS = $(COMMON_SUBDIRS)
 
-COMMON_LIBADD = api/libapi.la \
-				agg/libagg.la
+COMMON_LIBADD = api/libapi.la agg/libagg.la
 MPSOURCES = 
 MPLDFLAGS = -release $(LT_RELEASE) -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
@@ -15,7 +14,7 @@ lib_LTLIBRARIES = libmgplus@LIB_SUFFIX@.la
 libmgplus@LIB_SUFFIX@_la_LIBADD = $(COMMON_LIBADD) @DEP_LIBS@
 libmgplus@LIB_SUFFIX@_la_DEPENDENCIES = $(COMMON_LIBADD)
 libmgplus@LIB_SUFFIX@_la_SOURCES = $(MPSOURCES)
-libmgplus@LIB_SUFFIX@_la_LDFLAGS = $(MPLDFLAGS) 
+libmgplus@LIB_SUFFIX@_la_LDFLAGS = $(MPLDFLAGS)
 
 CLEANFILES=*.a
 EXTRA_DIST=

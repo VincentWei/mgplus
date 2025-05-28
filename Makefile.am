@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = '-I m4'
+
 SUBDIRS = src include m4 cmake
 
 COMM_HDRS = mgplusconfig.h

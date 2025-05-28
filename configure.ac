@@ -1,7 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.60)
-AC_INIT(libmgplus, 1.5.1)
+AC_PREREQ([2.71])
+AC_INIT([libmgplus],[1.5.1])
+AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR(src/agg/agg_platform_support.cpp)
 
 dnl Set various version strings
@@ -30,6 +31,7 @@ AC_SUBST(MGPLUS_BINARY_AGE)
 AC_SUBST(MGPLUS_VERSION)
 
 # libtool versioning
+LT_INIT
 LT_RELEASE=$MGPLUS_MAJOR_VERSION.$MGPLUS_MINOR_VERSION
 LT_CURRENT=`expr $MGPLUS_MICRO_VERSION - $MGPLUS_INTERFACE_AGE`
 LT_REVISION=$MGPLUS_INTERFACE_AGE
@@ -53,7 +55,7 @@ AC_DEFINE_UNQUOTED(MGPLUS_BINARY_AGE, $MGPLUS_BINARY_AGE,
 
 dnl ========================================================================
 dnl Need for cross-compiling
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 dnl ========================================================================
 dnl Init automake
@@ -63,9 +65,6 @@ dnl ========================================================================
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_LD
-AC_PROG_RANLIB
-AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -77,12 +76,6 @@ dnl Put the name and version of the package here
 
 # Checks for header files.
 AC_HEADER_DIRENT
-AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([fcntl.h stdlib.h string.h sys/ioctl.h sys/time.h termio.h termios.h unistd.h])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_PID_T
@@ -171,7 +164,7 @@ pixfmt_rgb565_support=$enableval)
 AC_ARG_WITH(libsuffix,
   [  --with-libsuffix=ARG    configure the suffix of the library name.])
 
-AM_CONFIG_HEADER(mgplusconfig.h)
+AC_CONFIG_HEADERS(mgplusconfig.h)
 
 if test "x$build_fashion_lfrdr" = "xyes"; then
     AC_DEFINE(_MGPLUS_LFRDR_FASHION, 1,
@@ -262,19 +255,19 @@ if test "x$devel_mode" = "xyes"; then
         CPPFLAGS="$CPPFLAGS -DDEBUG"
     fi
 
-    if test "$ac_cv_prog_gcc" = "yes"; then
+    if test "$ac_cv_c_compiler_gnu" = "yes"; then
         CPPFLAGS="$CPPFLAGS -Wall -Werror"
     fi
 else
     CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
 
-if test "$ac_cv_prog_gcc" = "yes"; then
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
     CFLAGS="$CFLAGS -Wstrict-prototypes -pipe"
 fi
 
-CPPFLAGS="$CPPFLAGS $FT2_CFLAGS"
-DEP_LIBS="$DEP_LIBS $MINIGUI_LIBS $FT2_LIBS -lpthread -lstdc++"
+CPPFLAGS="-std=c++14 $CPPFLAGS $FT2_CFLAGS"
+DEP_LIBS="-lstdc++ $DEP_LIBS $MINIGUI_LIBS $FT2_LIBS -lpthread"
 
 AM_CONDITIONAL(MGPLUS_FONT_FT2, test "x$build_ft2_support" = "xyes")
 
@@ -288,7 +281,7 @@ AC_SUBST(APP_LIBS)
 AC_SUBST(DEP_LIBS)
 
 dnl AC_CONFIG_FILES
-AC_OUTPUT([
+AC_CONFIG_FILES([
         mgplus.pc
         Makefile
         m4/Makefile
@@ -298,4 +291,5 @@ AC_OUTPUT([
         src/agg/Makefile
         src/api/Makefile
 ])
+AC_OUTPUT
 
