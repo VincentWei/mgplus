@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.71])
-AC_INIT([libmgplus],[1.5.4])
+AC_INIT([libmgplus],[1.5.5])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_SRCDIR(src/agg/agg_platform_support.cpp)
 

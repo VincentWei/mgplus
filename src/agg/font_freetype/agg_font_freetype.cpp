@@ -186,11 +186,11 @@ namespace agg
 
         FT_Vector*  point;
         FT_Vector*  limit;
-        unsigned char* tags;
+        char* tags;
 
         int   n;         // index of contour in outline
         int   first;     // index of first point in contour
-        unsigned char  tag;       // current point's state
+        char  tag;       // current point's state
 
         first = 0;
 
@@ -207,8 +207,8 @@ namespace agg
             v_control = v_start;
 
             point = outline.points + first;
-            tags  = outline.tags  + first;
-            tag   = FT_CURVE_TAG(tags[0]);
+            tags  = (char *)outline.tags  + first;
+            tag   = (char)FT_CURVE_TAG(tags[0]);
 
             // A contour cannot start with a cubic control point!
             if(tag == FT_CURVE_TAG_CUBIC) return false;
